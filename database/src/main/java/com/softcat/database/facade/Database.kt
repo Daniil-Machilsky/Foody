@@ -10,6 +10,7 @@ import com.softcat.database.remote.interfaces.FavouritesManager
 import com.softcat.database.local.dao.RecipeDao
 import com.softcat.database.local.dao.RecipeVectorDao
 import com.softcat.database.local.dao.TagDao
+import com.softcat.database.models.RecipeVectorDbModel
 import com.softcat.database.models.UserDbModel
 import com.softcat.database.remote.interfaces.InitializeManager
 import com.softcat.database.remote.interfaces.ScoreManager
@@ -179,7 +180,11 @@ class Database @Inject constructor(
         scoreManager.updateScoreCache(null)
     }
 
-    override suspend fun getRecipeVectors() = recipeVectorDao.getAll()
+    override suspend fun getRecipeVectors(recipeIds: List<Int>): List<RecipeVectorDbModel> {
+        val models = recipeVectorDao.getByIds(recipeIds)
+        val modelsMap = models.associateBy { it.id }
+        return recipeIds.mapNotNull { recipeId -> modelsMap[recipeId] }
+    }
 
     override suspend fun updateScoreCache(userId: String?) = scoreManager.updateScoreCache(userId)
 }

@@ -22,33 +22,37 @@ class RecommendationManagerImpl @Inject constructor(
     private val matcher: IngredientMatcher
 ): RecommendationManager {
 
-    // IDEF уровня 0
     override suspend fun getRecommendation(
         scores: List<Score>,
         ingredients: List<Ingredient>,
         maxAbsentIngredients: Int,
         tags: List<RecipeTag>
     ): List<Recipe> {
-        val (recipeIds, recipeVectors) = readRecipes()
+        val recipeIds = getFilteredRecipeIds(ingredients, maxAbsentIngredients, tags)
+        if (recipeIds.isEmpty())
+            return emptyList()
+        val recipeVectors = readRecipes(recipeIds)
         val scoreValues = applyRecommendModel(recipeIds, recipeVectors, scores)
         val recipes = assembleRecommendation(recipeIds, scoreValues)
-        return filter(recipes, ingredients, maxAbsentIngredients, tags)
+        return recipes
     }
 
-    // IDEF уровня 1 блок 1
-    private suspend fun readRecipes(): Pair<List<Int>, D2Array<Float>> {
-        val recipeVectors = database.getRecipeVectors()
+    private suspend fun readRecipes(recipeIds: List<Int>): D2Array<Float> {
+        val recipeVectors = database.getRecipeVectors(recipeIds)
         val n = recipeVectors.size
         val m = recipeVectors.first().vector.size
-        val numbers = List(n * m) {
-            recipeVectors[it / m].vector[it % m]
+
+        val flatArray = FloatArray(n * m)
+        for (i in 0 until n) {
+            val vector = recipeVectors[i].vector
+            for (j in 0 until m) {
+                flatArray[i * m + j] = vector[j]
+            }
         }
-        val recipeMatrix = mk.ndarray(numbers, n, m)
-        val recipeIds = recipeVectors.map { it.id }
-        return recipeIds to recipeMatrix
+        val recipeMatrix = mk.ndarray(flatArray, n, m)
+        return recipeMatrix
     }
 
-    // IDEF уровня 1, блок 2
     private fun applyRecommendModel(
         recipeIds: List<Int>,
         recipes: D2Array<Float>,
@@ -60,7 +64,6 @@ class RecommendationManagerImpl @Inject constructor(
         return otherScores.data.toList()
     }
 
-    // IDEF уровня 1, блок 3
     private suspend fun assembleRecommendation(
         recipeIds: List<Int>,
         scores: List<Float>
@@ -79,7 +82,17 @@ class RecommendationManagerImpl @Inject constructor(
         }
     }
 
-    // IDEF уровня 1, блок 4
+    private suspend fun getFilteredRecipeIds(
+        ingredients: List<Ingredient>,
+        maxAbsentIngredients: Int,
+        tags: List<RecipeTag>
+    ): List<Int> {
+        val recipes = mapper.toEntities(database.getRecipeSample(1000))
+        return filter(recipes, ingredients, maxAbsentIngredients, tags).map {
+            it.id
+        }
+    }
+
     private fun filter(
         recipes: List<Recipe>,
         ingredients: List<Ingredient>,
@@ -106,7 +119,6 @@ class RecommendationManagerImpl @Inject constructor(
         }
     }
 
-    // IDEF уровня 2, блок 2.1
     private fun getLearnData(
         recipeIds: List<Int>,
         recipes: D2Array<Float>,
