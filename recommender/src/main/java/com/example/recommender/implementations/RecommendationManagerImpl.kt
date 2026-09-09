@@ -1,5 +1,6 @@
 package com.example.recommender.implementations
 
+import com.example.recommender.implementations.ingredientMatcher.IngredientMatcher
 import com.example.recommender.interfaces.RecommendationManager
 import com.example.recommender.mlModels.RecommendModel
 import com.softcat.database.facade.DatabaseFacade
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 class RecommendationManagerImpl @Inject constructor(
     private val database: DatabaseFacade,
-    private val mapper: RecipeMapper
+    private val mapper: RecipeMapper,
+    private val matcher: IngredientMatcher
 ): RecommendationManager {
 
     // IDEF уровня 0
@@ -90,14 +92,17 @@ class RecommendationManagerImpl @Inject constructor(
                     return@filter false
             }
             var missIngredient = 0
-            recipe.ingredients.forEach {
-                if (!ingredients.contains(it)) {
-                    ++missIngredient
-                    if (missIngredient > maxAbsentIngredients)
-                        return@filter false
+            var i = 0
+            while (i < recipe.ingredients.size && missIngredient <= maxAbsentIngredients) {
+                val ingredientName = recipe.ingredients[i].name
+                val match = ingredients.any {
+                    matcher.equal(ingredientName, it.name)
                 }
+                if (!match)
+                    ++missIngredient
+                ++i
             }
-            true
+            missIngredient <= maxAbsentIngredients
         }
     }
 

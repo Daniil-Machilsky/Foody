@@ -1,6 +1,8 @@
 package com.example.recommender.implementations.ingredientMatcher
 
-class IngredientMatcherImpl: IngredientMatcher {
+import javax.inject.Inject
+
+class IngredientMatcherImpl @Inject constructor(): IngredientMatcher {
     /**
      * Основная функция сравнения двух ингредиентов
      * @param ingredient1 первый ингредиент
