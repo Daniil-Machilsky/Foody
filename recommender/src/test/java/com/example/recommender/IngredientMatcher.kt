@@ -15,7 +15,7 @@ class IngredientMatcherTest {
     private val matcher = IngredientMatcherImpl()
 
     private fun checkCase(a: String, b: String, answer: Boolean) {
-        assertEquals(matcher.equal(a, b), answer)
+        assertEquals(answer, matcher.equal(a, b))
     }
 
     @Test
