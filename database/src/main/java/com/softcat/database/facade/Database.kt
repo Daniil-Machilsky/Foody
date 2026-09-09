@@ -180,10 +180,10 @@ class Database @Inject constructor(
         scoreManager.updateScoreCache(null)
     }
 
-    override suspend fun getRecipeVectors(recipeIds: List<Int>): List<RecipeVectorDbModel> {
+    override suspend fun getRecipeVectors(recipeIds: List<Int>): Pair<List<Int>, List<RecipeVectorDbModel>> {
         val models = recipeVectorDao.getByIds(recipeIds)
         val modelsMap = models.associateBy { it.id }
-        return recipeIds.mapNotNull { recipeId -> modelsMap[recipeId] }
+        return modelsMap.keys.toList() to modelsMap.values.toList()
     }
 
     override suspend fun updateScoreCache(userId: String?) = scoreManager.updateScoreCache(userId)

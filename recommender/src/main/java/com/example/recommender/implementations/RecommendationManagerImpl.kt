@@ -10,8 +10,10 @@ import com.softcat.domain.entities.RecipeTag
 import com.softcat.domain.entities.Score
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
+import org.jetbrains.kotlinx.multik.ndarray.data.D1
 import org.jetbrains.kotlinx.multik.ndarray.data.D1Array
 import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
+import org.jetbrains.kotlinx.multik.ndarray.data.MultiArray
 import org.jetbrains.kotlinx.multik.ndarray.data.get
 import org.jetbrains.kotlinx.multik.ndarray.operations.stack
 import javax.inject.Inject
@@ -31,14 +33,14 @@ class RecommendationManagerImpl @Inject constructor(
         val recipeIds = getFilteredRecipeIds(ingredients, maxAbsentIngredients, tags)
         if (recipeIds.isEmpty())
             return emptyList()
-        val recipeVectors = readRecipes(recipeIds)
-        val scoreValues = applyRecommendModel(recipeIds, recipeVectors, scores)
-        val recipes = assembleRecommendation(recipeIds, scoreValues)
+        val (vectorIds, recipeVectors) = readRecipeVectors(recipeIds)
+        val scoreValues = applyRecommendModel(vectorIds, recipeVectors, scores)
+        val recipes = assembleRecommendation(vectorIds, scoreValues)
         return recipes
     }
 
-    private suspend fun readRecipes(recipeIds: List<Int>): D2Array<Float> {
-        val recipeVectors = database.getRecipeVectors(recipeIds)
+    private suspend fun readRecipeVectors(recipeIds: List<Int>): Pair<List<Int>, D2Array<Float>> {
+        val (vectorIds, recipeVectors) = database.getRecipeVectors(recipeIds)
         val n = recipeVectors.size
         val m = recipeVectors.first().vector.size
 
@@ -50,7 +52,7 @@ class RecommendationManagerImpl @Inject constructor(
             }
         }
         val recipeMatrix = mk.ndarray(flatArray, n, m)
-        return recipeMatrix
+        return vectorIds to recipeMatrix
     }
 
     private fun applyRecommendModel(
@@ -124,16 +126,22 @@ class RecommendationManagerImpl @Inject constructor(
         recipes: D2Array<Float>,
         scores: List<Score>
     ): Pair<D2Array<Float>, D1Array<Float>> {
-        val numbers = scores.map { it.value.toFloat() }
-        val scoreValues = mk.ndarray(numbers)
-        val scoredVectors = scores.mapNotNull { score ->
-            val index = recipeIds.indexOfFirst { it == score.recipeId }
-            if (index == -1)
-                null
-            else
-                recipes[index]
+        val scoredVectors = mutableListOf<MultiArray<Float, D1>>()
+        val validScores = mutableListOf<Float>()
+        val recipeIdToIndex = recipeIds.withIndex().associate { it.value to it.index }
+
+        for (score in scores) {
+            val index = recipeIdToIndex[score.recipeId]
+            if (index != null) {
+                scoredVectors.add(recipes[index])
+                validScores.add(score.value.toFloat())
+            }
         }
+
+        // Если scoredVectors пустой, то будет исключение.
+        // Это позволяет уведомить, что рекомендация невозможна.
         val recipeMatrix = mk.stack(scoredVectors, axis = 0)
+        val scoreValues = mk.ndarray(validScores.toFloatArray())
         return recipeMatrix to scoreValues
     }
 }

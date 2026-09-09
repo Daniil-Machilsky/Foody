@@ -75,7 +75,7 @@ interface DatabaseFacade {
 
     suspend fun exit()
 
-    suspend fun getRecipeVectors(recipeIds: List<Int>): List<RecipeVectorDbModel>
+    suspend fun getRecipeVectors(recipeIds: List<Int>): Pair<List<Int>, List<RecipeVectorDbModel>>
 
     suspend fun updateScoreCache(userId: String?): Result<Unit>
 }
