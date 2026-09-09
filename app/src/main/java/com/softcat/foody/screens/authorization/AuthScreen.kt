@@ -55,9 +55,9 @@ import com.softcat.foody.screens.favourites.NavigationButton
 import com.softcat.foody.ui.theme.FoodyTheme
 
 @Composable
-fun AuthContent(component: AuthComponent) {
+fun AuthScreen(component: AuthComponent) {
     val model = component.model.collectAsState()
-    AuthContent(
+    AuthScreen(
         state = model.value,
         switchToInitialScreen = component::switchToInitialScreen,
         enter = component::enter,
@@ -72,7 +72,7 @@ fun AuthContent(component: AuthComponent) {
 }
 
 @Composable
-private fun AuthContent(
+private fun AuthScreen(
     state: AuthStore.State,
     switchToInitialScreen: () -> Unit,
     enter: () -> Unit,
@@ -132,7 +132,7 @@ private fun AuthContent(
                     modifier = Modifier.fillMaxSize().padding(top = topPadding),
                     contentAlignment = Alignment.Center
                 ) {
-                    ProgressBar()
+                    ProgressBar(color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -304,7 +304,7 @@ private fun Enter(
         )
         if (isLoading) {
             Spacer(Modifier.weight(1f))
-            ProgressBar()
+            ProgressBar(color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.weight(1f))
         } else {
             Spacer(Modifier.weight(2f))
@@ -437,7 +437,7 @@ private fun Registration(
         )
         if (isLoading) {
             Spacer(Modifier.weight(1f))
-            ProgressBar()
+            ProgressBar(color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.weight(1f))
         } else {
             Spacer(Modifier.weight(2f))
@@ -462,7 +462,7 @@ private fun RegistrationScreen_Preview() {
         isLoading = false
     )
     FoodyTheme {
-        AuthContent(
+        AuthScreen(
             state = state,
             switchToInitialScreen = {},
             enter = {},
@@ -486,7 +486,7 @@ private fun EnterScreen_Preview() {
         isLoading = false
     )
     FoodyTheme {
-        AuthContent(
+        AuthScreen(
             state = state,
             switchToInitialScreen = {},
             enter = {},
@@ -506,7 +506,7 @@ private fun EnterScreen_Preview() {
 private fun NoUser_Preview() {
     val state = AuthStore.State.NoUser
     FoodyTheme {
-        AuthContent(
+        AuthScreen(
             state = state,
             switchToInitialScreen = {},
             enter = {},
@@ -528,7 +528,7 @@ private fun EnterLoading_Preview() {
         "", "", true
     )
     FoodyTheme {
-        AuthContent(
+        AuthScreen(
             state = state,
             switchToInitialScreen = {},
             enter = {},
