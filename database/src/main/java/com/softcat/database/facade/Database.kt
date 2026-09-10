@@ -118,6 +118,8 @@ class Database @Inject constructor(
 
     override suspend fun getRecipeSample(limit: Int) = recipeDao.getSample(limit)
 
+    override suspend fun getRecipeIdSample(limit: Int) = recipeDao.getIdSample(limit)
+
     override suspend fun searchIngredient(query: String, limit: Int) = ingredientDao.search(query, limit)
 
     override suspend fun searchTag(query: String, limit: Int) = tagDao.search(query, limit)

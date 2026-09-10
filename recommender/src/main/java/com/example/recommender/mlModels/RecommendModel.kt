@@ -24,7 +24,6 @@ class RecommendModel(
     }
 
     companion object {
-        // IDEF уровня 2, блок 2.2
         fun learn(scoredRecipes: D2Array<Float>, scores: D1Array<Float>): RecommendModel {
             val profile = buildProfile(scoredRecipes, scores)
             val features = calculateMetrics(profile, scoredRecipes)
@@ -32,7 +31,6 @@ class RecommendModel(
             return RecommendModel(profile, regression)
         }
 
-        // IDEF уровня 3, блок 2.2.1
         private fun buildProfile(recipeMatrix: D2Array<Float>, scores: D1Array<Float>): D2Array<Float> {
             val m = recipeMatrix.shape[1]
             val profile = mk.zeros<Float>(5, m)
@@ -51,7 +49,6 @@ class RecommendModel(
             return profile
         }
 
-        // IDEF уровня 3, блок 2.2.3
         private fun calculateMetrics(
             profile: D2Array<Float>,
             recipeMatrix: D2Array<Float>
