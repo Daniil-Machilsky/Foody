@@ -18,6 +18,9 @@ interface RecipeVectorDao {
     @Query("select * from $RECIPE_VECTORS_TABLE_NAME")
     suspend fun getAll(): List<RecipeVectorDbModel>
 
+    @Query("select * from $RECIPE_VECTORS_TABLE_NAME where id in (:recipeIds)")
+    suspend fun getByIds(recipeIds: List<Int>): List<RecipeVectorDbModel>
+
     @Query("select * from $RECIPE_VECTORS_TABLE_NAME where id = :id")
     suspend fun getVectorById(id: Int): RecipeVectorDbModel?
 

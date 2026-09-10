@@ -41,6 +41,8 @@ interface DatabaseFacade {
 
     suspend fun getRecipeSample(limit: Int): List<RecipeDbModel>
 
+    suspend fun getRecipeIdSample(limit: Int): List<Int>
+
     suspend fun searchIngredient(query: String, limit: Int): List<IngredientDbModel>
 
     suspend fun searchTag(query: String, limit: Int): List<TagDbModel>
@@ -75,7 +77,7 @@ interface DatabaseFacade {
 
     suspend fun exit()
 
-    suspend fun getRecipeVectors(): List<RecipeVectorDbModel>
+    suspend fun getRecipeVectors(recipeIds: List<Int>): Pair<List<Int>, List<RecipeVectorDbModel>>
 
     suspend fun updateScoreCache(userId: String?): Result<Unit>
 }

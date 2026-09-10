@@ -1,5 +1,6 @@
 package com.example.recommender.implementations
 
+import com.example.recommender.implementations.ingredientMatcher.IngredientMatcher
 import com.example.recommender.interfaces.RecommendationManager
 import com.example.recommender.mlModels.RecommendModel
 import com.softcat.database.facade.DatabaseFacade
@@ -7,116 +8,133 @@ import com.softcat.domain.entities.Ingredient
 import com.softcat.domain.entities.Recipe
 import com.softcat.domain.entities.RecipeTag
 import com.softcat.domain.entities.Score
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
-import org.jetbrains.kotlinx.multik.ndarray.data.D1Array
+import org.jetbrains.kotlinx.multik.api.toNDArray
 import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
-import org.jetbrains.kotlinx.multik.ndarray.data.get
-import org.jetbrains.kotlinx.multik.ndarray.operations.stack
+import org.jetbrains.kotlinx.multik.ndarray.operations.toList
 import javax.inject.Inject
 
 class RecommendationManagerImpl @Inject constructor(
     private val database: DatabaseFacade,
-    private val mapper: RecipeMapper
+    private val mapper: RecipeMapper,
+    private val matcher: IngredientMatcher
 ): RecommendationManager {
 
-    // IDEF уровня 0
+    @Volatile
+    private var model: RecommendModel? = null
+
+    private val mutex = Mutex()
+
+    override suspend fun setUserScores(scores: List<Score>) {
+        if (scores.size < 2)
+            throw Exception("Scores count is less than 2. Cannot create a model.")
+        val newModel = buildRecommendModel(scores)
+        mutex.withLock {
+            model = newModel
+        }
+    }
+
+
     override suspend fun getRecommendation(
-        scores: List<Score>,
         ingredients: List<Ingredient>,
         maxAbsentIngredients: Int,
         tags: List<RecipeTag>
     ): List<Recipe> {
-        val (recipeIds, recipeVectors) = readRecipes()
-        val scoreValues = applyRecommendModel(recipeIds, recipeVectors, scores)
-        val recipes = assembleRecommendation(recipeIds, scoreValues)
-        return filter(recipes, ingredients, maxAbsentIngredients, tags)
+        val recipeIds = getFilteredRecipeIds(ingredients, maxAbsentIngredients, tags)
+        if (recipeIds.isEmpty())
+            return emptyList()
+        val (vectorIds, vectors) = readRecipeVectors(recipeIds)
+        val model = mutex.withLock {
+            model ?: return emptyList()
+        }
+
+        val scoreValues = model.predict(vectors).toList()
+        val recipes = assembleRecommendation(vectorIds, scoreValues)
+        return recipes
     }
 
-    // IDEF уровня 1 блок 1
-    private suspend fun readRecipes(): Pair<List<Int>, D2Array<Float>> {
-        val recipeVectors = database.getRecipeVectors()
+    private suspend fun readRecipeVectors(recipeIds: List<Int>): Pair<List<Int>, D2Array<Float>> {
+        val (vectorIds, recipeVectors) = database.getRecipeVectors(recipeIds)
         val n = recipeVectors.size
         val m = recipeVectors.first().vector.size
-        val numbers = List(n * m) {
-            recipeVectors[it / m].vector[it % m]
+
+        val flatArray = FloatArray(n * m)
+        for (i in 0 until n) {
+            val vector = recipeVectors[i].vector
+            for (j in 0 until m) {
+                flatArray[i * m + j] = vector[j]
+            }
         }
-        val recipeMatrix = mk.ndarray(numbers, n, m)
-        val recipeIds = recipeVectors.map { it.id }
-        return recipeIds to recipeMatrix
+        val recipeMatrix = mk.ndarray(flatArray, n, m)
+        return vectorIds to recipeMatrix
     }
 
-    // IDEF уровня 1, блок 2
-    private fun applyRecommendModel(
-        recipeIds: List<Int>,
-        recipes: D2Array<Float>,
-        scores: List<Score>
-    ): List<Float> {
-        val (scoredRecipes, scoreValues) = getLearnData(recipeIds, recipes, scores)
-        val model = RecommendModel.learn(scoredRecipes, scoreValues)
-        val otherScores = model.predict(recipes)
-        return otherScores.data.toList()
+    private suspend fun buildRecommendModel(scores: List<Score>): RecommendModel {
+        val scoredRecipeIds = scores.map { it.recipeId }
+        val idToScore = scores.associate { it.recipeId to it.value }
+
+        val (vectorIds, recipeVectors) = readRecipeVectors(scoredRecipeIds)
+        val scoreValues = vectorIds.map {
+            id -> (idToScore[id] ?: 3).toFloat()
+        }.toNDArray()
+
+        val model = RecommendModel.learn(recipeVectors, scoreValues)
+        return model
     }
 
-    // IDEF уровня 1, блок 3
     private suspend fun assembleRecommendation(
         recipeIds: List<Int>,
         scores: List<Float>
     ): List<Recipe> {
-        val pairs = scores
+        val recommendedIds = scores
             .zip(recipeIds)
             .filter { it.first >= 4f }
             .sortedByDescending { it.first }
+            .map { it.second }
 
-        val recipeModels = database.getRecipes(recipeIds)
-        val recipeMap = mapper.toEntities(recipeModels)
-            .associateBy({ it.id }, { it })
-
-        return pairs.mapNotNull {
-            recipeMap[it.second]
+        val recipeModels = database.getRecipes(recommendedIds)
+        val recipeMap = mapper.toEntities(recipeModels).associateBy { it.id }
+        return recommendedIds.mapNotNull {
+            recipeMap[it]
         }
     }
 
-    // IDEF уровня 1, блок 4
-    private fun filter(
-        recipes: List<Recipe>,
+    private suspend fun getFilteredRecipeIds(
+        ingredients: List<Ingredient>,
+        maxAbsentIngredients: Int,
+        tags: List<RecipeTag>
+    ): List<Int> {
+        val recipes = mapper.toEntities(database.getRecipeSample(1000))
+        return recipes.filter(ingredients, maxAbsentIngredients, tags).map {
+            recipe -> recipe.id
+        }
+    }
+
+    private fun List<Recipe>.filter(
         ingredients: List<Ingredient>,
         maxAbsentIngredients: Int,
         tags: List<RecipeTag>
     ): List<Recipe> {
-        return recipes.filter { recipe ->
+        return filter { recipe ->
             tags.forEach {
                 if (!recipe.tags.contains(it))
                     return@filter false
             }
             var missIngredient = 0
-            recipe.ingredients.forEach {
-                if (!ingredients.contains(it)) {
-                    ++missIngredient
-                    if (missIngredient > maxAbsentIngredients)
-                        return@filter false
+            var i = 0
+            while (i < recipe.ingredients.size && missIngredient <= maxAbsentIngredients) {
+                val ingredientName = recipe.ingredients[i].name
+                val match = ingredients.any {
+                    matcher.equal(ingredientName, it.name)
                 }
+                if (!match)
+                    ++missIngredient
+                ++i
             }
-            true
+            missIngredient <= maxAbsentIngredients
         }
-    }
-
-    // IDEF уровня 2, блок 2.1
-    private fun getLearnData(
-        recipeIds: List<Int>,
-        recipes: D2Array<Float>,
-        scores: List<Score>
-    ): Pair<D2Array<Float>, D1Array<Float>> {
-        val numbers = scores.map { it.value.toFloat() }
-        val scoreValues = mk.ndarray(numbers)
-        val scoredVectors = scores.mapNotNull { score ->
-            val index = recipeIds.indexOfFirst { it == score.recipeId }
-            if (index == -1)
-                null
-            else
-                recipes[index]
-        }
-        val recipeMatrix = mk.stack(scoredVectors, axis = 0)
-        return recipeMatrix to scoreValues
     }
 }

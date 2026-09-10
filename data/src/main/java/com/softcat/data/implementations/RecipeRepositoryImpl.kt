@@ -36,8 +36,8 @@ class RecipeRepositoryImpl @Inject constructor(
         tags: List<RecipeTag>
     ): Result<List<Recipe>> {
         return try {
+            recommender.setUserScores(scores)
             val recipes = recommender.getRecommendation(
-                scores,
                 ingredients,
                 maxAbsentIngredients,
                 tags

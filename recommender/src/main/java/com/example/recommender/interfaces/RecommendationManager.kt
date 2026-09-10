@@ -6,8 +6,10 @@ import com.softcat.domain.entities.RecipeTag
 import com.softcat.domain.entities.Score
 
 interface RecommendationManager {
+
+    suspend fun setUserScores(scores: List<Score>)
+
     suspend fun getRecommendation(
-        scores: List<Score>,
         ingredients: List<Ingredient>,
         maxAbsentIngredients: Int,
         tags: List<RecipeTag>

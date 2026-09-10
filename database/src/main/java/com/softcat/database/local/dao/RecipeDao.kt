@@ -20,6 +20,9 @@ interface RecipeDao {
     @Query("select * from $RECIPES_TABLE_NAME limit :limit")
     suspend fun getSample(limit: Int): List<RecipeDbModel>
 
+    @Query("select id from $RECIPES_TABLE_NAME limit :limit")
+    suspend fun getIdSample(limit: Int): List<Int>
+
     @Query("select * from $RECIPES_TABLE_NAME where id = :recipeId")
     suspend fun get(recipeId: Int): RecipeDbModel?
 
