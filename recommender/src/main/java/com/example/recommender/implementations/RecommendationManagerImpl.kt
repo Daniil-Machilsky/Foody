@@ -29,6 +29,8 @@ class RecommendationManagerImpl @Inject constructor(
     private val mutex = Mutex()
 
     override suspend fun setUserScores(scores: List<Score>) {
+        if (scores.size < 2)
+            throw Exception("Scores count is less than 2. Cannot create a model.")
         val newModel = buildRecommendModel(scores)
         mutex.withLock {
             model = newModel
@@ -42,6 +44,8 @@ class RecommendationManagerImpl @Inject constructor(
         tags: List<RecipeTag>
     ): List<Recipe> {
         val recipeIds = getFilteredRecipeIds(ingredients, maxAbsentIngredients, tags)
+        if (recipeIds.isEmpty())
+            return emptyList()
         val (vectorIds, vectors) = readRecipeVectors(recipeIds)
         val model = mutex.withLock {
             model ?: return emptyList()
