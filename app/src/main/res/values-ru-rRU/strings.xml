@@ -104,4 +104,11 @@
     <string name="fridge_category_other">Другое</string>
     <string name="fridge_title">Холодильник</string>
     <string name="choose_available_products">Выберите доступные продукты</string>
+
+    // Экран приготовления рецепта
+    <string name="prepare_title">Подготовьте ингредиенты</string>
+    <string name="portions_count">Порции</string>
+    <string name="cooking">Приготовление</string>
+    <string name="prepare_step_title">Приготовиться</string>
+    <string name="step_title">Шаг %d</string>
 </resources>
