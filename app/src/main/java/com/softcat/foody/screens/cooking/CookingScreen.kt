@@ -1,6 +1,8 @@
 package com.softcat.foody.screens.cooking
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,7 +59,8 @@ fun CookingContent(
         when (val content = state.content) {
             is CookingStore.State.StepContent.Instruction -> {
                 StepInstruction(
-                    text = content.text
+                    text = content.text,
+                    Modifier.padding(horizontal = 16.dp, vertical = 32.dp)
                 )
             }
             is CookingStore.State.StepContent.Prepare -> {
@@ -71,6 +75,7 @@ fun CookingContent(
     }
 }
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 private fun PrepareIngredientsContent(
     portions: Int,
@@ -79,19 +84,29 @@ private fun PrepareIngredientsContent(
     portionsIncrement: () -> Unit,
     portionsDecrement: () -> Unit,
 ) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val minListHeight = screenHeight * 0.05f
+    val maxListHeight = screenHeight * 0.4f
+
     Column(
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(16.dp))
         PrepareTitle()
+        Spacer(Modifier.height(16.dp))
         IngredientList(
             ingredients = ingredients,
+            modifier = Modifier.heightIn(min = minListHeight, max = maxListHeight)
         )
+        Spacer(Modifier.height(16.dp))
         PortionsSelector(
             portions = portions,
             portionsIncrement = portionsIncrement,
             portionsDecrement = portionsDecrement
         )
+        Spacer(Modifier.weight(1f))
     }
 }
 
@@ -125,8 +140,10 @@ private fun CookingStep(
                 contentScale = ContentScale.Fit,
                 placeholder = painterResource(R.drawable.hat_smile_image),
             )
-            stepContent()
-            Spacer(Modifier.weight(1f))
+            Box(
+                modifier = Modifier.weight(1f),
+                content = { stepContent() }
+            )
             StepSelector(
                 stepNumber = stepNumber,
                 stepCount = stepCount,
@@ -169,26 +186,31 @@ private fun CookingContent_PrepareStep_Preview() {
         content = CookingStore.State.StepContent.Prepare(
             ingredients = listOf(
                 CookingStore.State.IngredientDescription(
+                    id = 1,
                     name = "Какао",
                     quantity = "500",
                     units = "г"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 2,
                     name = "Сахар",
                     quantity = "200",
                     units = "г"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 3,
                     name = "Яйца",
                     quantity = "1",
                     units = "шт"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 4,
                     name = "Молоко",
                     quantity = "200",
                     units = "мл"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 5,
                     name = "Разрыхлитель",
                     quantity = "2",
                     units = "г"
@@ -220,26 +242,31 @@ private fun PrepareIngredientsContent_Preview() {
             portions = 1,
             ingredients = listOf(
                 CookingStore.State.IngredientDescription(
+                    id = 1,
                     name = "Какао",
                     quantity = "500",
                     units = "г"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 2,
                     name = "Сахар",
                     quantity = "200",
                     units = "г"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 3,
                     name = "Яйца",
                     quantity = "1",
                     units = "шт"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 4,
                     name = "Молоко",
                     quantity = "200",
                     units = "мл"
                 ),
                 CookingStore.State.IngredientDescription(
+                    id = 5,
                     name = "Разрыхлитель",
                     quantity = "2",
                     units = "г"

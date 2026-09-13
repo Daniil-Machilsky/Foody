@@ -11,6 +11,7 @@ interface CookingStore: Store<CookingStore.Intent, CookingStore.State, CookingSt
         val imageUrl: String
     ) {
         data class IngredientDescription(
+            val id: Int,
             val name: String,
             val quantity: String,
             val units: String

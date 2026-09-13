@@ -109,6 +109,6 @@
     <string name="prepare_title">Подготовьте ингредиенты</string>
     <string name="portions_count">Порции</string>
     <string name="cooking">Приготовление</string>
-    <string name="prepare_step_title">Приготовиться</string>
+    <string name="prepare_step_title">Подготовиться</string>
     <string name="step_title">Шаг %d</string>
 </resources>

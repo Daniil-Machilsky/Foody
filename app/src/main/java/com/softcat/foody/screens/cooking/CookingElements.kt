@@ -49,12 +49,11 @@ fun IngredientList(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 16.dp)
             .then(modifier)
     ) {
         itemsIndexed(
             items = ingredients,
-            key = { _, item -> item.name }
+            key = { _, item -> item.id }
         ) { index, ingredient ->
             IngredientDescription(
                 name = ingredient.name,
@@ -79,8 +78,8 @@ fun PortionsSelector(
             text = stringResource(R.string.portions_count),
             style = MaterialTheme.typography.headlineSmall,
             color = Black,
-            modifier = Modifier.padding(horizontal = 8.dp)
         )
+        Spacer(Modifier.width(8.dp))
         IncrementButton(portionsIncrement)
         Text(
             text = portions.toString(),
@@ -141,14 +140,15 @@ private fun IncrementButton(
 
 @Composable
 fun StepInstruction(
-    text: String
+    text: String,
+    modifier: Modifier = Modifier
 ) {
     Card(
+        modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         ),
-        modifier = Modifier.padding(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background
         )
@@ -223,9 +223,7 @@ fun PrepareTitle() {
         text = stringResource(R.string.prepare_title),
         style = MaterialTheme.typography.headlineSmall,
         color = Black,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+        modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Start,
         fontWeight = FontWeight.Bold
     )
@@ -307,21 +305,25 @@ private fun StepCard(
 private fun IngredientList_Preview() {
     val ingredients = listOf(
         CookingStore.State.IngredientDescription(
+            id = 1,
             name = "Мука",
             quantity = "200",
             units = "г"
         ),
         CookingStore.State.IngredientDescription(
+            id = 2,
             name = "Яйца",
             quantity = "2",
             units = "шт"
         ),
         CookingStore.State.IngredientDescription(
+            id = 3,
             name = "Сахар",
             quantity = "150",
             units = "г"
         ),
         CookingStore.State.IngredientDescription(
+            id = 4,
             name = "Разрыхлитель",
             quantity = "1.5",
             units = "г"
