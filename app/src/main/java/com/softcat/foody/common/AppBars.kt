@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,11 +42,13 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.softcat.foody.R
+import com.softcat.foody.ui.theme.FoodyTypography
 
 @Composable
 @Preview(showBackground = true)
@@ -153,47 +156,54 @@ fun SimpleAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@NonRestartableComposable
 @Preview
 fun ScoresTopBar(
     onBackClicked: () -> Unit = {}
 ) {
-    TopAppBar(
-        modifier = Modifier.height(64.dp),
-        expandedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight,
-        windowInsets = TopAppBarDefaults.windowInsets
-            .only(WindowInsetsSides.Horizontal),
-        title = {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.scores),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall,
-                color = White
-            )
-        },
-        navigationIcon = {
-            IconButton(onBackClicked) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    painter = painterResource(R.drawable.back),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.background
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors().copy(
-            containerColor = MaterialTheme.colorScheme.primary
-        )
+    TopBar(
+        title = stringResource(R.string.scores),
+        onBackClicked = onBackClicked,
+        backButtonVisible = true
+    )
+}
+
+@Composable
+@NonRestartableComposable
+@Preview
+fun AuthTopBar(
+    onBackClicked: () -> Unit = {}
+) {
+    TopBar(
+        title = stringResource(R.string.authorization),
+        onBackClicked = onBackClicked,
+        backButtonVisible = true
+    )
+}
+
+@Composable
+@NonRestartableComposable
+@Preview
+fun CookingTopBar(
+    onBackClicked: () -> Unit = {}
+) {
+    TopBar(
+        title = stringResource(R.string.cooking),
+        onBackClicked = onBackClicked,
+        backButtonVisible = true,
+        style = FoodyTypography.headlineSmall
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
-fun AuthTopBar(
-    onBackClicked: () -> Unit = {}
+@NonRestartableComposable
+fun TopBar(
+    title: String,
+    onBackClicked: () -> Unit = {},
+    backButtonVisible: Boolean,
+    style: TextStyle = MaterialTheme.typography.headlineSmall
 ) {
     TopAppBar(
         modifier = Modifier.height(64.dp),
@@ -203,20 +213,22 @@ fun AuthTopBar(
         title = {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.authorization),
+                text = title,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall,
+                style = style,
                 color = White
             )
         },
         navigationIcon = {
-            IconButton(onBackClicked) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    painter = painterResource(R.drawable.back),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.background
-                )
+            if (backButtonVisible) {
+                IconButton(onBackClicked) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        painter = painterResource(R.drawable.back),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.background
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors().copy(

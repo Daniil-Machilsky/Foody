@@ -105,4 +105,11 @@
     <string name="fridge_category_other">Other</string>
     <string name="fridge_title">Fridge</string>
     <string name="choose_available_products">Choose available products</string>
+
+    // Экран приготовления рецепта
+    <string name="prepare_title">Prepare ingredients</string>
+    <string name="portions_count">Portions</string>
+    <string name="cooking">Cooking</string>
+    <string name="prepare_step_title">Prepare</string>
+    <string name="step_title">Step %d</string>
 </resources>
