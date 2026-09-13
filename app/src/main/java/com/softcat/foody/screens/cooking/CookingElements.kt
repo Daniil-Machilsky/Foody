@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.softcat.foody.R
 import com.softcat.foody.ui.theme.FoodyTheme
+import com.softcat.foody.ui.theme.FoodyTypography
 import com.softcat.foody.ui.theme.LightGray
 
 @Composable
@@ -76,14 +77,14 @@ fun PortionsSelector(
     ) {
         Text(
             text = stringResource(R.string.portions_count),
-            style = MaterialTheme.typography.headlineSmall,
+            style = FoodyTypography.labelLarge,
             color = Black,
         )
         Spacer(Modifier.width(8.dp))
         IncrementButton(portionsIncrement)
         Text(
             text = portions.toString(),
-            style = MaterialTheme.typography.headlineSmall,
+            style = FoodyTypography.headlineSmall,
             color = Black,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
@@ -155,7 +156,7 @@ fun StepInstruction(
     ) {
         Text(
             text = text,
-            style= MaterialTheme.typography.bodyMedium,
+            style= FoodyTypography.bodyLarge,
             color = Black,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(16.dp)
@@ -185,19 +186,19 @@ private fun IngredientDescription(
         Spacer(Modifier.width(8.dp))
         Text(
             text = name,
-            style = MaterialTheme.typography.labelLarge,
+            style = FoodyTypography.labelMedium,
             color = LightGray
         )
         Spacer(Modifier.weight(1f))
         Text(
             text = quantity,
-            style = MaterialTheme.typography.labelLarge,
+            style = FoodyTypography.labelMedium,
             color = LightGray
         )
         Spacer(Modifier.width(4.dp))
         Text(
             text = units,
-            style = MaterialTheme.typography.labelLarge,
+            style = FoodyTypography.labelMedium,
             color = LightGray
         )
         Spacer(Modifier.width(8.dp))
@@ -293,7 +294,7 @@ private fun StepCard(
                     stringResource(R.string.prepare_step_title)
                 else
                     stringResource(R.string.step_title, stepNumber),
-                style = MaterialTheme.typography.labelSmall,
+                style = FoodyTypography.labelSmall,
                 color = Black
             )
         }

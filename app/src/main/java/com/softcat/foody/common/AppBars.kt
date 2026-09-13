@@ -42,11 +42,13 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.softcat.foody.R
+import com.softcat.foody.ui.theme.FoodyTypography
 
 @Composable
 @Preview(showBackground = true)
@@ -189,7 +191,8 @@ fun CookingTopBar(
     TopBar(
         title = stringResource(R.string.cooking),
         onBackClicked = onBackClicked,
-        backButtonVisible = true
+        backButtonVisible = true,
+        style = FoodyTypography.headlineSmall
     )
 }
 
@@ -199,7 +202,8 @@ fun CookingTopBar(
 fun TopBar(
     title: String,
     onBackClicked: () -> Unit = {},
-    backButtonVisible: Boolean
+    backButtonVisible: Boolean,
+    style: TextStyle = MaterialTheme.typography.headlineSmall
 ) {
     TopAppBar(
         modifier = Modifier.height(64.dp),
@@ -211,7 +215,7 @@ fun TopBar(
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall,
+                style = style,
                 color = White
             )
         },
