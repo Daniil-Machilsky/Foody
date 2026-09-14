@@ -1,10 +1,10 @@
 package com.softcat.foody.screens.cooking
 
-import kotlinx.coroutines.flow.StateFlow
+import com.arkivanov.decompose.value.Value
 
 interface CookingComponent {
 
-    val model: StateFlow<CookingStore.State>
+    val model: Value<CookingStore.State>
 
     fun selectStep(step: Int)
 
@@ -13,4 +13,6 @@ interface CookingComponent {
     fun decreasePortions()
 
     fun back()
+
+    fun changeFavouriteStatus()
 }

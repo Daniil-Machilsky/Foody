@@ -206,35 +206,35 @@ fun RecipeExtraInfoCard(
                 modifier = Modifier.fillMaxWidth(),
                 iconResId = R.drawable.protein_icon,
                 labelResId = R.string.protein,
-                unitsResId = R.string.gram,
+                unitsResId = R.string.unit_gram,
                 value = data.protein.toInt()
             )
             ExtraInfoElement(
                 modifier = Modifier.fillMaxWidth(),
                 iconResId = R.drawable.carbohydrates_icon,
                 labelResId = R.string.carbohydrates,
-                unitsResId = R.string.gram,
+                unitsResId = R.string.unit_gram,
                 value = data.carbohydrates.toInt()
             )
             ExtraInfoElement(
                 modifier = Modifier.fillMaxWidth(),
                 iconResId = R.drawable.sugar_icon,
                 labelResId = R.string.sugar,
-                unitsResId = R.string.gram,
+                unitsResId = R.string.unit_gram,
                 value = data.sugar.toInt()
             )
             ExtraInfoElement(
                 modifier = Modifier.fillMaxWidth(),
                 iconResId = R.drawable.fat_icon,
                 labelResId = R.string.fat,
-                unitsResId = R.string.gram,
+                unitsResId = R.string.unit_gram,
                 value = data.fat.toInt()
             )
             ExtraInfoElement(
                 modifier = Modifier.fillMaxWidth(),
                 iconResId = R.drawable.fat_icon,
                 labelResId = R.string.saturated_fat,
-                unitsResId = R.string.gram,
+                unitsResId = R.string.unit_gram,
                 value = data.saturatedFat.toInt()
             )
         }
@@ -471,7 +471,11 @@ private fun Details_Preview() {
                 protein = 5f,
                 saturatedFat = 150f,
                 carbohydrates = 150f
-            )
+            ),
+            imageUrl = "",
+            stepImages = emptyList(),
+            ingredientQuantity = emptyList(),
+            ingredientUnits = emptyList(),
         ),
         stepNumber = 1,
         isScoreVisible = true,

@@ -12,5 +12,15 @@ data class Recipe(
     val tags: List<RecipeTag>,
     val isCooked: Boolean,
     val minutes: Int,
-    val nutrition: NutritionData
-)
+    val nutrition: NutritionData,
+    val imageUrl: String,
+    val stepImages: List<String>,
+    val ingredientQuantity: List<Float>,
+    val ingredientUnits: List<IngredientUnit>
+) {
+    enum class IngredientUnit {
+        Piece,
+        Milliliter, Liter,
+        Gram, Kilo,
+    }
+}
