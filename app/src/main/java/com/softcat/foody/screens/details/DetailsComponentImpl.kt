@@ -16,6 +16,7 @@ class DetailsComponentImpl @AssistedInject constructor(
     @Assisted("context") componentContext: ComponentContext,
     @Assisted("recipe") recipe: Recipe,
     @Assisted("context") private val onBackClicked: () -> Unit,
+    @Assisted("openCookingRecipe") private val openCookingRecipeCallback: (Recipe) -> Unit
 ): DetailsComponent, ComponentContext by componentContext {
 
     private val store = instanceKeeper.getStore { storeFactory.create(recipe, componentContext.lifecycle) }
@@ -63,7 +64,8 @@ class DetailsComponentImpl @AssistedInject constructor(
         fun create(
             @Assisted("context") componentContext: ComponentContext,
             @Assisted("context") onBackClicked: () -> Unit,
-            @Assisted("recipe") recipe: Recipe
+            @Assisted("recipe") recipe: Recipe,
+            @Assisted("openCookingRecipe") openCookingRecipeCallback: (Recipe) -> Unit
         ): DetailsComponentImpl
     }
 }

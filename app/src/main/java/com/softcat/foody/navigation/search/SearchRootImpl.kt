@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
 
 class SearchRootImpl @AssistedInject constructor(
     @Assisted("context") componentContext: ComponentContext,
+    @Assisted("openCookingRecipe") private val openCookingRecipeCallback: (Recipe) -> Unit,
     private val searchComponentFactory: SearchComponentImpl.Factory,
     private val detailsComponentFactory: DetailsComponentImpl.Factory
 ): SearchRoot, ComponentContext by componentContext {
@@ -42,7 +43,8 @@ class SearchRootImpl @AssistedInject constructor(
                 val component = detailsComponentFactory.create(
                     componentContext = componentContext,
                     recipe = config.recipe,
-                    onBackClicked = { navigation.pop() }
+                    onBackClicked = { navigation.pop() },
+                    openCookingRecipeCallback = openCookingRecipeCallback,
                 )
                 SearchRoot.Child.Details(component)
             }
@@ -70,6 +72,7 @@ class SearchRootImpl @AssistedInject constructor(
     interface Factory {
         fun create(
             @Assisted("context") componentContext: ComponentContext,
+            @Assisted("openCookingRecipe") openCookingRecipeCallback: (Recipe) -> Unit,
         ): SearchRootImpl
     }
 }

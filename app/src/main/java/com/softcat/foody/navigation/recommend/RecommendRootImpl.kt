@@ -19,6 +19,7 @@ import kotlinx.serialization.Serializable
 
 class RecommendRootImpl @AssistedInject constructor(
     @Assisted("context") componentContext: ComponentContext,
+    @Assisted("openCookingRecipe") private val openCookingRecipeCallback: (Recipe) -> Unit,
     private val detailsComponentFactory: DetailsComponentImpl.Factory,
     private val recommendComponentFactory: RecommendComponentImpl.Factory,
     private val fridgeComponentFactory: FridgeComponentImpl.Factory,
@@ -44,7 +45,8 @@ class RecommendRootImpl @AssistedInject constructor(
                 val component = detailsComponentFactory.create(
                     componentContext = componentContext,
                     recipe = config.recipe,
-                    onBackClicked = { navigation.pop() }
+                    onBackClicked = { navigation.pop() },
+                    openCookingRecipeCallback = openCookingRecipeCallback
                 )
                 RecommendRoot.Child.Details(component)
             }
@@ -90,6 +92,7 @@ class RecommendRootImpl @AssistedInject constructor(
     interface Factory {
         fun create(
             @Assisted("context") componentContext: ComponentContext,
+            @Assisted("openCookingRecipe") openCookingRecipeCallback: (Recipe) -> Unit,
         ): RecommendRootImpl
     }
 }

@@ -20,6 +20,7 @@ class FavouritesRootImpl @AssistedInject constructor(
     @Assisted("context") componentContext: ComponentContext,
     @Assisted("openSearch") private val openSearchCallback: () -> Unit,
     @Assisted("openRecommendations") private val openRecommendationsCallback: () -> Unit,
+    @Assisted("openCooking") private val openCookingRecipeCallback: (Recipe) -> Unit,
     private val favouritesComponentFactory: FavouritesComponentImpl.Factory,
     private val detailsComponentFactory: DetailsComponentImpl.Factory
 ): FavouritesRoot, ComponentContext by componentContext {
@@ -44,7 +45,8 @@ class FavouritesRootImpl @AssistedInject constructor(
                 val component = detailsComponentFactory.create(
                     componentContext = componentContext,
                     recipe = config.recipe,
-                    onBackClicked = { navigation.pop() }
+                    onBackClicked = { navigation.pop() },
+                    openCookingRecipeCallback = openCookingRecipeCallback
                 )
                 FavouritesRoot.Child.Details(component)
             }
@@ -76,6 +78,7 @@ class FavouritesRootImpl @AssistedInject constructor(
             @Assisted("context") componentContext: ComponentContext,
             @Assisted("openSearch") openSearchCallback: () -> Unit,
             @Assisted("openRecommendations") openRecommendationsCallback: () -> Unit,
+            @Assisted("openCooking") openCookingRecipeCallback: (Recipe) -> Unit,
         ): FavouritesRootImpl
     }
 }
