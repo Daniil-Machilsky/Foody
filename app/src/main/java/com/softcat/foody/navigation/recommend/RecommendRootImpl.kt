@@ -32,7 +32,8 @@ class RecommendRootImpl @AssistedInject constructor(
         initialConfiguration = Config.Recommendations,
         serializer = Config.serializer(),
         key = "RecommendationsScreenStack",
-        childFactory = ::child
+        childFactory = ::child,
+        handleBackButton = true
     )
 
     @OptIn(DelicateDecomposeApi::class)
