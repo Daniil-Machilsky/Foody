@@ -16,6 +16,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 import javax.inject.Inject
 
 class CookingStoreFactory @Inject constructor(
@@ -90,6 +93,7 @@ class CookingStoreFactory @Inject constructor(
     ) : CoroutineExecutor<CookingStore.Intent, Action, CookingStore.State, Msg, Nothing>() {
 
         private var userId: String? = null
+        private var portionsCount: Int = 1
 
         override fun executeAction(action: Action) {
             Timber.i("${this::class.simpleName}.executeAction($action)")
@@ -106,7 +110,7 @@ class CookingStoreFactory @Inject constructor(
             when (intent) {
                 CookingStore.Intent.DecreasePortions -> decreasePortions()
                 CookingStore.Intent.IncreasePortions -> increasePortions()
-                is CookingStore.Intent.SelectStep -> dispatch(Msg.SetStep(intent.step))
+                is CookingStore.Intent.SelectStep -> dispatch(Msg.SetStep(portionsCount, intent.step))
                 CookingStore.Intent.ChangeIsFavourite -> changeIsFavourite()
             }
         }
@@ -117,6 +121,7 @@ class CookingStoreFactory @Inject constructor(
                 content is CookingStore.State.StepContent.Prepare &&
                 content.portions < MAX_PORTIONS
             ) {
+                portionsCount += 1
                 dispatch(Msg.SetPortions(content.portions + 1))
             }
         }
@@ -127,6 +132,7 @@ class CookingStoreFactory @Inject constructor(
                 content is CookingStore.State.StepContent.Prepare &&
                 content.portions > MIN_PORTIONS
             ) {
+                portionsCount -= 1
                 dispatch(Msg.SetPortions(content.portions - 1))
             }
         }
@@ -160,7 +166,7 @@ class CookingStoreFactory @Inject constructor(
 
                 is Msg.SetStep -> {
                     if (msg.step == 0)
-                        recipeToPrepareState(recipe, 1)
+                        recipeToPrepareState(recipe, msg.portionsCount)
                     else
                         recipeToStepContent(recipe, msg.step)
                 }
@@ -180,7 +186,7 @@ class CookingStoreFactory @Inject constructor(
                     CookingStore.State.IngredientDescription(
                         id = ingredient.id,
                         name = ingredient.name,
-                        quantity = "%.2f".format(recipe.ingredientQuantity[index] * portions),
+                        quantity = formatQuantity(recipe.ingredientQuantity[index] * portions),
                         unitsResId = recipe.ingredientUnits[index].toLabelResId(),
                     )
                 },
@@ -202,7 +208,10 @@ class CookingStoreFactory @Inject constructor(
     }
 
     private sealed interface Msg {
-        data class SetStep(val step: Int): Msg
+        data class SetStep(
+            val portionsCount: Int,
+            val step: Int
+        ): Msg
         data class SetPortions(val count: Int): Msg
         data class IsFavouriteUpdated(
             val isFavourite: Boolean,
@@ -224,7 +233,7 @@ class CookingStoreFactory @Inject constructor(
                 CookingStore.State.IngredientDescription(
                     id = ingredient.id,
                     name = ingredient.name,
-                    quantity = "%.2f".format(recipe.ingredientQuantity[index]),
+                    quantity = formatQuantity(recipe.ingredientQuantity[index]),
                     unitsResId = recipe.ingredientUnits[index].toLabelResId(),
                 )
             },
@@ -236,6 +245,12 @@ class CookingStoreFactory @Inject constructor(
         isFavourite = false,
         isFavouriteVisible = false,
     )
+
+    private fun formatQuantity(quantity: Float): String {
+        val symbols = DecimalFormatSymbols(Locale.getDefault())
+        val df = DecimalFormat("#.##", symbols)
+        return df.format(quantity)
+    }
 
     companion object {
         private const val MIN_PORTIONS = 1
