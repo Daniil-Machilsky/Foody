@@ -9,7 +9,6 @@ interface DetailsStore: Store<DetailsStore.Intent, DetailsStore.State, Nothing> 
         data object ChangeFavouriteStatus: Intent
         data class UpdateScore(val newValue: Int): Intent
         data object RemoveScore: Intent
-        data object ChangeIsCooked: Intent
         data object NextStep: Intent
         data object PreviousStep: Intent
     }
