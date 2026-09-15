@@ -74,6 +74,7 @@ class OnboardingRootComponentImpl @AssistedInject constructor(
         @Serializable
         data object Init: Config
 
+        @Serializable
         data class CookingRecipe(val recipe: Recipe): Config
     }
 

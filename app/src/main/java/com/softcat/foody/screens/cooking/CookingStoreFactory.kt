@@ -13,6 +13,7 @@ import com.softcat.domain.usecases.UserUseCase
 import com.softcat.foody.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -58,7 +59,7 @@ class CookingStoreFactory @Inject constructor(
         }
 
         private suspend fun userCollector(user: User?) {
-            collectFavouritesJob?.cancel()
+            collectFavouritesJob?.cancelAndJoin()
             val userId = user?.id
             if (userId == null) {
                 withContext(Dispatchers.Main) {
