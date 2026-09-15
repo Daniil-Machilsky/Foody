@@ -81,6 +81,7 @@
     <string name="score">Score</string>
     <string name="recipe_details_title">Recipe details</string>
     <string name="authorize_to_access_scores">Authorize to score this recipe</string>
+    <string name="start_cooking">Start cooking</string>
 
     <string name="initialization_title">Initialization</string>
     <string name="initialization_instruction">Select recipe database size</string>
