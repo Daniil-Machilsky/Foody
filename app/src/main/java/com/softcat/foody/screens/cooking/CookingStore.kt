@@ -10,7 +10,8 @@ interface CookingStore: Store<CookingStore.Intent, CookingStore.State, Nothing> 
         val stepCount: Int,
         val imageUrl: String,
         val isFavourite: Boolean,
-        val isFavouriteVisible: Boolean
+        val isFavouriteVisible: Boolean,
+        val isCooked: Boolean
     ) {
         data class IngredientDescription(
             val id: Int,
@@ -36,5 +37,6 @@ interface CookingStore: Store<CookingStore.Intent, CookingStore.State, Nothing> 
         data object IncreasePortions : Intent
         data object DecreasePortions : Intent
         data object ChangeIsFavourite: Intent
+        data object ChangeIsCooked: Intent
     }
 }

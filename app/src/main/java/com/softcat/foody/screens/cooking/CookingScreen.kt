@@ -12,18 +12,24 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.softcat.foody.R
 import com.softcat.foody.common.CookingTopBar
+import com.softcat.foody.common.Switcher
 import com.softcat.foody.ui.theme.FoodyTheme
+import com.softcat.foody.ui.theme.FoodyTypography
+import com.softcat.foody.ui.theme.LightGray
 
 @Composable
 fun CookingScreen(
@@ -37,7 +43,8 @@ fun CookingScreen(
         onStepSelected = component::selectStep,
         portionsIncrement = component::increasePortions,
         portionsDecrement = component::decreasePortions,
-        changeFavouriteStatus = component::changeFavouriteStatus
+        changeFavouriteStatus = component::changeFavouriteStatus,
+        isCookedChange = component::changeIsCookedStatus
     )
 }
 
@@ -48,7 +55,8 @@ fun CookingContent(
     onStepSelected: (Int) -> Unit,
     portionsIncrement: () -> Unit,
     portionsDecrement: () -> Unit,
-    changeFavouriteStatus: () -> Unit
+    changeFavouriteStatus: () -> Unit,
+    isCookedChange: () -> Unit
 ) {
     CookingStep(
         imageUrl = state.imageUrl,
@@ -62,9 +70,11 @@ fun CookingContent(
     ) {
         when (val content = state.content) {
             is CookingStore.State.StepContent.Instruction -> {
-                StepInstruction(
-                    text = content.text,
-                    Modifier
+                StepDescription(
+                    stepInstructionText = content.text,
+                    isCooked = state.isCooked,
+                    isCookedChange = isCookedChange,
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 32.dp)
                 )
@@ -78,6 +88,36 @@ fun CookingContent(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun StepDescription(
+    stepInstructionText: String,
+    isCooked: Boolean,
+    isCookedChange: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        StepInstruction(
+            text = stepInstructionText,
+            modifier = Modifier
+        )
+        Spacer(Modifier.weight(1f))
+        Switcher(
+            modifier = Modifier,
+            checked = isCooked,
+            onCheckedChanged = isCookedChange
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.is_cooked),
+            color = LightGray,
+            style = FoodyTypography.bodyMedium
+        )
     }
 }
 
@@ -179,6 +219,7 @@ private fun CookingContent_Preview() {
         imageUrl = "",
         isFavourite = false,
         isFavouriteVisible = false,
+        isCooked = false
     )
 
     FoodyTheme {
@@ -189,6 +230,7 @@ private fun CookingContent_Preview() {
             portionsIncrement = {},
             portionsDecrement = {},
             changeFavouriteStatus = {},
+            isCookedChange = {}
         )
     }
 }
@@ -238,6 +280,7 @@ private fun CookingContent_PrepareStep_Preview() {
         imageUrl = "",
         isFavourite = true,
         isFavouriteVisible = false,
+        isCooked = false
     )
 
     FoodyTheme {
@@ -248,6 +291,7 @@ private fun CookingContent_PrepareStep_Preview() {
             portionsIncrement = {},
             portionsDecrement = {},
             changeFavouriteStatus = {},
+            isCookedChange = {}
         )
     }
 }

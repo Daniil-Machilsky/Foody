@@ -15,4 +15,6 @@ interface CookingComponent {
     fun back()
 
     fun changeFavouriteStatus()
+
+    fun changeIsCookedStatus()
 }

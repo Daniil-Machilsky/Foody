@@ -118,4 +118,6 @@
     <string name="unit_liter">l</string>
     <string name="unit_milliliter">ml</string>
     <string name="unit_piece">pcs</string>
+    <string name="specify_cooked">Specify as cooked</string>
+    <string name="specify_not_cooked">Not cooked</string>
 </resources>

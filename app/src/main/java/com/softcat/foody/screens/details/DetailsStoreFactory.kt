@@ -10,7 +10,6 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.softcat.domain.entities.Recipe
 import com.softcat.domain.entities.User
 import com.softcat.domain.usecases.FavouritesUseCase
-import com.softcat.domain.usecases.RecipeUseCase
 import com.softcat.domain.usecases.ScoreUseCase
 import com.softcat.domain.usecases.UserUseCase
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +24,6 @@ class DetailsStoreFactory @Inject constructor(
     private val favouritesUseCase: FavouritesUseCase,
     private val userUseCase: UserUseCase,
     private val scoreUseCase: ScoreUseCase,
-    private val recipeUseCase: RecipeUseCase,
 ) {
 
     fun create(recipe: Recipe, lifecycle: Lifecycle): DetailsStore =
@@ -47,8 +45,6 @@ class DetailsStoreFactory @Inject constructor(
     sealed interface Msg {
         data class SetIsFavourite(val newValue: Boolean): Msg
 
-        data class SetIsCooked(val newValue: Boolean): Msg
-
         data class SetScore(val newValue: Int): Msg
 
         data object NextStep: Msg
@@ -65,7 +61,6 @@ class DetailsStoreFactory @Inject constructor(
 
         private var favouritesCollectingJob: Job? = null
         private var scoreCollectJob: Job? = null
-        private var isCookedCollectJob: Job? = null
         private var userCollectJob: Job? = null
 
         init {
@@ -73,23 +68,14 @@ class DetailsStoreFactory @Inject constructor(
                 userCollectJob = scope.launch {
                     userUseCase.observeLastEnteredUser().collect(::userCollector)
                 }
-                isCookedCollectJob = scope.launch {
-                    recipeUseCase.observeIsCooked(recipeId).collect {
-                        withContext(Dispatchers.Main) {
-                            dispatch(Msg.SetIsCooked(it))
-                        }
-                    }
-                }
             }
             lifecycle.doOnStop {
                 favouritesCollectingJob?.cancel()
                 scoreCollectJob?.cancel()
-                isCookedCollectJob?.cancel()
                 userCollectJob?.cancel()
 
                 favouritesCollectingJob = null
                 scoreCollectJob = null
-                isCookedCollectJob = null
                 userCollectJob = null
             }
         }
@@ -127,12 +113,6 @@ class DetailsStoreFactory @Inject constructor(
             when (intent) {
 
                 DetailsStore.Intent.ChangeFavouriteStatus -> updateIsFavourite()
-
-                DetailsStore.Intent.ChangeIsCooked -> {
-                    scope.launch {
-                        recipeUseCase.setIsCooked(recipeId, !state().recipe.isCooked)
-                    }
-                }
 
                 DetailsStore.Intent.NextStep -> {
                     if (state().stepNumber < state().recipe.steps.size)
@@ -180,7 +160,6 @@ class DetailsStoreFactory @Inject constructor(
 
             return when (msg) {
                 is Msg.SetIsFavourite -> copy(isFavourite = msg.newValue, isFavouriteVisible = true)
-                is Msg.SetIsCooked -> copy(recipe = recipe.copy(isCooked = msg.newValue))
                 is Msg.SetScore -> copy(isScoreVisible = true, score = msg.newValue)
                 Msg.NextStep -> copy(stepNumber = stepNumber + 1)
                 Msg.PreviousStep -> copy(stepNumber = stepNumber - 1)

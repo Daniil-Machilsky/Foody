@@ -45,6 +45,11 @@ class CookingComponentImpl @AssistedInject constructor(
         store.accept(CookingStore.Intent.ChangeIsFavourite)
     }
 
+    override fun changeIsCookedStatus() {
+        Timber.i("${this::class.simpleName}.changeIsCookedStatus()")
+        store.accept(CookingStore.Intent.ChangeIsCooked)
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(
