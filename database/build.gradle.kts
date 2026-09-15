@@ -20,19 +20,19 @@ android {
         buildConfigField("String", "S3_ACCESS_KEY", "\"$s3AccessKey\"")
 
         val s3SecretKey = property("s3SecretKey")?.toString() ?:
-        error("No s3AccessKey api key defined in gradle.properties.")
+        error("No s3SecretKey api key defined in gradle.properties.")
         buildConfigField("String", "S3_SECRET_KEY", "\"$s3SecretKey\"")
 
         val s3Region = property("s3Region")?.toString() ?:
-        error("No s3AccessKey api key defined in gradle.properties.")
+        error("No s3Region api key defined in gradle.properties.")
         buildConfigField("String", "S3_REGION", "\"$s3Region\"")
 
         val s3Endpoint = property("s3Endpoint")?.toString() ?:
-        error("No s3AccessKey api key defined in gradle.properties.")
+        error("No s3Endpoint api key defined in gradle.properties.")
         buildConfigField("String", "S3_ENDPOINT", "\"$s3Endpoint\"")
 
         val bucketName = property("bucketName")?.toString() ?:
-        error("No s3AccessKey api key defined in gradle.properties.")
+        error("No bucketName api key defined in gradle.properties.")
         buildConfigField("String", "BUCKET_NAME", "\"$bucketName\"")
     }
 
