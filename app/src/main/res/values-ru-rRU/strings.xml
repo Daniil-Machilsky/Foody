@@ -81,6 +81,7 @@
     <string name="score">Оценка</string>
     <string name="recipe_details_title">Рецепт</string>
     <string name="authorize_to_access_scores">Авторизуйтесь для оценки рецепта</string>
+    <string name="start_cooking">Начать готовить</string>
 
     <string name="initialization_title">Подготовка</string>
     <string name="initialization_instruction">Выбор размера базы данных с рецептами</string>

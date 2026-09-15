@@ -46,7 +46,6 @@ import com.softcat.domain.entities.RecipeTag
 import com.softcat.foody.R
 import com.softcat.foody.common.DetailsTopBar
 import com.softcat.foody.common.ElementsScrollableFlow
-import com.softcat.foody.common.Switcher
 import com.softcat.foody.ui.theme.FoodyTheme
 
 @Composable
@@ -68,7 +67,7 @@ private fun RecipeStep(
         )
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             IconButton(
@@ -317,10 +316,9 @@ private fun RecipeScore(
 @Preview
 private fun UserScoringData(
     modifier: Modifier = Modifier,
-    isCooked: Boolean = false,
     scoreValue: Int = 3,
     isScoreVisible: Boolean = true,
-    onIsCookedChanged: () -> Unit = {},
+    cookRecipeClicked: () -> Unit = {},
     deleteScore: () -> Unit = {},
     onScoreChanged: (Int) -> Unit = {}
 ) {
@@ -331,15 +329,9 @@ private fun UserScoringData(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(32.dp))
-        Switcher(
-            modifier = Modifier.size(64.dp, 32.dp),
-            checked = isCooked,
-            onCheckedChanged = onIsCookedChanged
-        )
-        Text(
-            text = stringResource(R.string.is_cooked),
-            color = MaterialTheme.colorScheme.tertiary,
-            style = MaterialTheme.typography.bodyMedium
+        CookRecipeButton(
+            onClick = cookRecipeClicked,
+            modifier = Modifier.fillMaxWidth(0.5f)
         )
         Spacer(Modifier.height(16.dp))
         RecipeScore(
@@ -362,9 +354,9 @@ fun DetailsScreen(component: DetailsComponent) {
         changeFavouriteStatus = component::changeFavouriteStatus,
         previousStep = component::previousStep,
         nextStep = component::nextStep,
-        changeIsCooked = component::changeIsCooked,
         deleteScore = component::deleteScore,
-        updateScore = component::updateScore
+        updateScore = component::updateScore,
+        cookRecipeClicked = {}
     )
 }
 
@@ -376,7 +368,7 @@ private fun DetailsContent(
     changeFavouriteStatus: () -> Unit,
     previousStep: () -> Unit,
     nextStep: () -> Unit,
-    changeIsCooked: () -> Unit,
+    cookRecipeClicked: () -> Unit,
     deleteScore: () -> Unit,
     updateScore: (Int) -> Unit,
 ) {
@@ -440,10 +432,9 @@ private fun DetailsContent(
             )
             UserScoringData(
                 modifier = Modifier,
-                isCooked = state.recipe.isCooked,
                 scoreValue = state.score,
                 isScoreVisible = state.isScoreVisible,
-                onIsCookedChanged = changeIsCooked,
+                cookRecipeClicked = cookRecipeClicked,
                 deleteScore = deleteScore,
                 onScoreChanged = updateScore
             )
@@ -496,7 +487,7 @@ private fun Details_Preview() {
             changeFavouriteStatus = {},
             previousStep = {},
             nextStep = {},
-            changeIsCooked = {},
+            cookRecipeClicked = {},
             deleteScore = {},
             updateScore = {},
         )
