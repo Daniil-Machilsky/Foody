@@ -182,17 +182,48 @@ fun AuthTopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @NonRestartableComposable
 @Preview
 fun CookingTopBar(
-    onBackClicked: () -> Unit = {}
+    onBackClicked: () -> Unit = {},
+    onChangeFavouriteStatus: () -> Unit = {},
+    isFavourite: Boolean = false,
+    isFavouriteVisible: Boolean = true
 ) {
-    TopBar(
-        title = stringResource(R.string.cooking),
-        onBackClicked = onBackClicked,
-        backButtonVisible = true,
-        style = FoodyTypography.headlineSmall
+    TopAppBar(
+        windowInsets = TopAppBarDefaults.windowInsets,
+        title = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.cooking),
+                textAlign = TextAlign.Center,
+                style = FoodyTypography.headlineSmall,
+                color = White
+            )
+        },
+        navigationIcon = {
+            IconButton(onBackClicked) {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    painter = painterResource(R.drawable.back),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.background
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors().copy(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        actions = {
+            if (isFavouriteVisible) {
+                AddToFavouritesButton(
+                    isFavourite = isFavourite,
+                    onClick = onChangeFavouriteStatus
+                )
+            }
+        }
     )
 }
 

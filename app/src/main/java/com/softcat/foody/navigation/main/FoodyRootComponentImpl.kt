@@ -7,6 +7,7 @@ import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.childPages
 import com.arkivanov.decompose.router.pages.select
 import com.arkivanov.decompose.value.Value
+import com.softcat.domain.entities.Recipe
 import com.softcat.foody.navigation.favourites.FavouritesRootImpl
 import com.softcat.foody.navigation.search.SearchRootImpl
 import com.softcat.foody.navigation.profile.ProfileRootImpl
@@ -19,6 +20,7 @@ import timber.log.Timber
 
 class FoodyRootComponentImpl @AssistedInject constructor(
     @Assisted("context") componentContext: ComponentContext,
+    @Assisted("openCookingRecipe") private val openCookingRecipeCallback: (Recipe) -> Unit,
     private val searchRootFactory: SearchRootImpl.Factory,
     private val favouritesRootFactory: FavouritesRootImpl.Factory,
     private val profileRootFactory: ProfileRootImpl.Factory,
@@ -56,6 +58,7 @@ class FoodyRootComponentImpl @AssistedInject constructor(
                     openRecommendationsCallback = {
                         navigation.select(ENTRIES.indexOf(Config.RecommendationsRoot))
                     },
+                    openCookingRecipeCallback = openCookingRecipeCallback
                 )
                 FoodyRootComponent.Child.FavouritesNavComponent(component)
             }
@@ -66,11 +69,17 @@ class FoodyRootComponentImpl @AssistedInject constructor(
                 FoodyRootComponent.Child.ProfileNavComponent(component)
             }
             Config.RecommendationsRoot -> {
-                val component = recommendRootFactory.create(componentContext)
+                val component = recommendRootFactory.create(
+                    componentContext = componentContext,
+                    openCookingRecipeCallback = openCookingRecipeCallback,
+                )
                 FoodyRootComponent.Child.RecommendNavComponent(component)
             }
             Config.SearchRoot -> {
-                val component = searchRootFactory.create(componentContext)
+                val component = searchRootFactory.create(
+                    componentContext = componentContext,
+                    openCookingRecipeCallback = openCookingRecipeCallback,
+                )
                 FoodyRootComponent.Child.SearchNavComponent(component)
             }
         }
@@ -104,6 +113,7 @@ class FoodyRootComponentImpl @AssistedInject constructor(
     interface Factory {
         fun create(
             @Assisted("context") componentContext: ComponentContext,
+            @Assisted("openCookingRecipe") openCookingRecipeCallback: (Recipe) -> Unit
         ): FoodyRootComponentImpl
     }
 }

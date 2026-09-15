@@ -12,7 +12,7 @@ interface DetailsComponent {
 
     fun deleteScore()
 
-    fun changeIsCooked()
+    fun openCookingScreen()
 
     fun nextStep()
     fun previousStep()

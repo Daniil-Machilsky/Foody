@@ -2,19 +2,21 @@ package com.softcat.foody.screens.cooking
 
 import com.arkivanov.mvikotlin.core.store.Store
 
-interface CookingStore: Store<CookingStore.Intent, CookingStore.State, CookingStore.Label> {
+interface CookingStore: Store<CookingStore.Intent, CookingStore.State, Nothing> {
 
     data class State(
         val content: StepContent,
         val stepNumber: Int,
         val stepCount: Int,
-        val imageUrl: String
+        val imageUrl: String,
+        val isFavourite: Boolean,
+        val isFavouriteVisible: Boolean
     ) {
         data class IngredientDescription(
             val id: Int,
             val name: String,
             val quantity: String,
-            val units: String
+            val unitsResId: Int
         )
 
         sealed interface StepContent {
@@ -29,7 +31,10 @@ interface CookingStore: Store<CookingStore.Intent, CookingStore.State, CookingSt
         }
     }
 
-    sealed interface Intent {}
-
-    sealed interface Label {}
+    sealed interface Intent {
+        data class SelectStep(val step: Int) : Intent
+        data object IncreasePortions : Intent
+        data object DecreasePortions : Intent
+        data object ChangeIsFavourite: Intent
+    }
 }

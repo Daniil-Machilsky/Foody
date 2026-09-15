@@ -68,7 +68,6 @@
 
     <string name="calories_units">Cal</string>
     <string name="calories">Calories</string>
-    <string name="gram">g</string>
     <string name="min">min</string>
     <string name="fat">Fat</string>
     <string name="sugar">Sugar</string>
@@ -113,4 +112,10 @@
     <string name="cooking">Cooking</string>
     <string name="prepare_step_title">Prepare</string>
     <string name="step_title">Step %d</string>
+
+    <string name="unit_gram">g</string>
+    <string name="unit_kilo">kg</string>
+    <string name="unit_liter">l</string>
+    <string name="unit_milliliter">ml</string>
+    <string name="unit_piece">pcs</string>
 </resources>

@@ -16,12 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.softcat.foody.R
 import com.softcat.foody.common.CookingTopBar
 import com.softcat.foody.ui.theme.FoodyTheme
@@ -30,14 +29,15 @@ import com.softcat.foody.ui.theme.FoodyTheme
 fun CookingScreen(
     component: CookingComponent
 ) {
-    val state by component.model.collectAsStateWithLifecycle()
+    val state by component.model.subscribeAsState()
 
     CookingContent(
         state = state,
         onBackClicked = component::back,
         onStepSelected = component::selectStep,
         portionsIncrement = component::increasePortions,
-        portionsDecrement = component::decreasePortions
+        portionsDecrement = component::decreasePortions,
+        changeFavouriteStatus = component::changeFavouriteStatus
     )
 }
 
@@ -48,6 +48,7 @@ fun CookingContent(
     onStepSelected: (Int) -> Unit,
     portionsIncrement: () -> Unit,
     portionsDecrement: () -> Unit,
+    changeFavouriteStatus: () -> Unit
 ) {
     CookingStep(
         imageUrl = state.imageUrl,
@@ -55,12 +56,17 @@ fun CookingContent(
         stepCount = state.stepCount,
         onBackClicked = onBackClicked,
         onStepSelected = onStepSelected,
+        isFavourite = state.isFavourite,
+        isFavouriteVisible = state.isFavouriteVisible,
+        onChangeFavouriteStatus = changeFavouriteStatus,
     ) {
         when (val content = state.content) {
             is CookingStore.State.StepContent.Instruction -> {
                 StepInstruction(
                     text = content.text,
-                    Modifier.padding(horizontal = 16.dp, vertical = 32.dp)
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 32.dp)
                 )
             }
             is CookingStore.State.StepContent.Prepare -> {
@@ -84,10 +90,6 @@ private fun PrepareIngredientsContent(
     portionsIncrement: () -> Unit,
     portionsDecrement: () -> Unit,
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val minListHeight = screenHeight * 0.05f
-    val maxListHeight = screenHeight * 0.4f
-
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -98,7 +100,7 @@ private fun PrepareIngredientsContent(
         Spacer(Modifier.height(16.dp))
         IngredientList(
             ingredients = ingredients,
-            modifier = Modifier.heightIn(min = minListHeight, max = maxListHeight)
+            modifier = Modifier.weight(1f)
         )
         Spacer(Modifier.height(16.dp))
         PortionsSelector(
@@ -106,7 +108,7 @@ private fun PrepareIngredientsContent(
             portionsIncrement = portionsIncrement,
             portionsDecrement = portionsDecrement
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -115,20 +117,30 @@ private fun CookingStep(
     imageUrl: String,
     stepNumber: Int,
     stepCount: Int,
+    isFavourite: Boolean,
+    isFavouriteVisible: Boolean,
 
     onBackClicked: () -> Unit,
+    onChangeFavouriteStatus: () -> Unit,
     onStepSelected: (Int) -> Unit,
 
     stepContent: @Composable () -> Unit,
 ) {
     Scaffold(
-        topBar = { CookingTopBar(onBackClicked) },
+        topBar = {
+            CookingTopBar(
+                onBackClicked = onBackClicked,
+                onChangeFavouriteStatus = onChangeFavouriteStatus,
+                isFavourite = isFavourite,
+                isFavouriteVisible = isFavouriteVisible
+            )
+        },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
+                .padding(paddingValues)
         ) {
             AsyncImage(
                 model = imageUrl,
@@ -164,7 +176,9 @@ private fun CookingContent_Preview() {
         ),
         stepNumber = 1,
         stepCount = 3,
-        imageUrl = ""
+        imageUrl = "",
+        isFavourite = false,
+        isFavouriteVisible = false,
     )
 
     FoodyTheme {
@@ -173,7 +187,8 @@ private fun CookingContent_Preview() {
             onBackClicked = {},
             onStepSelected = {},
             portionsIncrement = {},
-            portionsDecrement = {}
+            portionsDecrement = {},
+            changeFavouriteStatus = {},
         )
     }
 }
@@ -189,38 +204,40 @@ private fun CookingContent_PrepareStep_Preview() {
                     id = 1,
                     name = "Какао",
                     quantity = "500",
-                    units = "г"
+                    unitsResId = R.string.unit_gram,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 2,
                     name = "Сахар",
                     quantity = "200",
-                    units = "г"
+                    unitsResId = R.string.unit_gram,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 3,
                     name = "Яйца",
                     quantity = "1",
-                    units = "шт"
+                    unitsResId = R.string.unit_piece,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 4,
                     name = "Молоко",
                     quantity = "200",
-                    units = "мл"
+                    unitsResId = R.string.unit_milliliter,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 5,
                     name = "Разрыхлитель",
                     quantity = "2",
-                    units = "г"
+                    unitsResId = R.string.unit_gram,
                 )
             ),
             portions = 1
         ),
         stepNumber = 1,
         stepCount = 3,
-        imageUrl = ""
+        imageUrl = "",
+        isFavourite = true,
+        isFavouriteVisible = false,
     )
 
     FoodyTheme {
@@ -229,7 +246,8 @@ private fun CookingContent_PrepareStep_Preview() {
             onBackClicked = {},
             onStepSelected = {},
             portionsIncrement = {},
-            portionsDecrement = {}
+            portionsDecrement = {},
+            changeFavouriteStatus = {},
         )
     }
 }
@@ -245,31 +263,31 @@ private fun PrepareIngredientsContent_Preview() {
                     id = 1,
                     name = "Какао",
                     quantity = "500",
-                    units = "г"
+                    unitsResId = R.string.unit_gram,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 2,
                     name = "Сахар",
                     quantity = "200",
-                    units = "г"
+                    unitsResId = R.string.unit_gram,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 3,
                     name = "Яйца",
                     quantity = "1",
-                    units = "шт"
+                    unitsResId = R.string.unit_piece,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 4,
                     name = "Молоко",
                     quantity = "200",
-                    units = "мл"
+                    unitsResId = R.string.unit_milliliter,
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 5,
                     name = "Разрыхлитель",
                     quantity = "2",
-                    units = "г"
+                    unitsResId = R.string.unit_gram,
                 )
             ),
             portionsIncrement = {},

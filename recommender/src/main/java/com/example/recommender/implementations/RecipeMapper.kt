@@ -32,6 +32,7 @@ class RecipeMapper @Inject constructor(
                 .split(",")
                 .mapNotNull { id -> tagMap[id.toInt()] }
 
+            val steps = model.steps.split("|")
             Recipe(
                 id = model.id,
                 name = model.name,
@@ -39,7 +40,7 @@ class RecipeMapper @Inject constructor(
                 isCooked = model.isCooked,
                 ingredients = ingredients,
                 tags = tags,
-                steps = model.steps.split("|"),
+                steps = steps,
                 minutes = model.minutes,
                 nutrition = NutritionData(
                     calories = model.calories,
@@ -50,6 +51,10 @@ class RecipeMapper @Inject constructor(
                     saturatedFat = model.saturatedFat,
                     carbohydrates = model.carbohydrates
                 ),
+                imageUrl = "",
+                stepImages = List(steps.size) { "" },
+                ingredientQuantity = List(ingredients.size) { 1f },
+                ingredientUnits = List(ingredients.size) { Recipe.IngredientUnit.Piece },
             )
         }
     }
