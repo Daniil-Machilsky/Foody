@@ -14,7 +14,7 @@ import timber.log.Timber
 class DetailsComponentImpl @AssistedInject constructor(
     private val storeFactory: DetailsStoreFactory,
     @Assisted("context") componentContext: ComponentContext,
-    @Assisted("recipe") recipe: Recipe,
+    @Assisted("recipe") private val recipe: Recipe,
     @Assisted("context") private val onBackClicked: () -> Unit,
     @Assisted("openCookingRecipe") private val openCookingRecipeCallback: (Recipe) -> Unit
 ): DetailsComponent, ComponentContext by componentContext {
@@ -39,9 +39,9 @@ class DetailsComponentImpl @AssistedInject constructor(
         store.accept(DetailsStore.Intent.RemoveScore)
     }
 
-    override fun changeIsCooked() {
-        Timber.i("${this::class.simpleName}: changeIsCooked()")
-        store.accept(DetailsStore.Intent.ChangeIsCooked)
+    override fun openCookingScreen() {
+        Timber.i("${this::class.simpleName}: openCookingScreen()")
+        openCookingRecipeCallback(recipe)
     }
 
     override fun nextStep() {

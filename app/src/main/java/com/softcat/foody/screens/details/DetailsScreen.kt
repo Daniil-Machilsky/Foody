@@ -356,7 +356,7 @@ fun DetailsScreen(component: DetailsComponent) {
         nextStep = component::nextStep,
         deleteScore = component::deleteScore,
         updateScore = component::updateScore,
-        cookRecipeClicked = {}
+        cookRecipeClicked = component::openCookingScreen
     )
 }
 
