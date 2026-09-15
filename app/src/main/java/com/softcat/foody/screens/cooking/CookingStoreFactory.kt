@@ -9,6 +9,7 @@ import com.softcat.domain.entities.Recipe
 import com.softcat.domain.entities.Recipe.IngredientUnit.*
 import com.softcat.domain.entities.User
 import com.softcat.domain.usecases.FavouritesUseCase
+import com.softcat.domain.usecases.RecipeUseCase
 import com.softcat.domain.usecases.UserUseCase
 import com.softcat.foody.R
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,8 @@ import javax.inject.Inject
 class CookingStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
     private val favouritesUseCase: FavouritesUseCase,
-    private val userUseCase: UserUseCase
+    private val userUseCase: UserUseCase,
+    private val recipeUseCase: RecipeUseCase
 ) {
     fun create(recipe: Recipe): CookingStore =
         object:
@@ -44,6 +46,8 @@ class CookingStoreFactory @Inject constructor(
             val isFavourite: Boolean,
             val isFavouriteVisible: Boolean
         ): Action
+
+        data class IsCookedUpdated(val isCooked: Boolean): Action
     }
 
     private inner class CookingBootstrapper(
@@ -55,6 +59,13 @@ class CookingStoreFactory @Inject constructor(
         override fun invoke() {
             scope.launch(Dispatchers.IO) {
                 userUseCase.observeLastEnteredUser().collect(::userCollector)
+            }
+            scope.launch(Dispatchers.IO) {
+                recipeUseCase.observeIsCooked(recipeId).collect {
+                    withContext(Dispatchers.Main) {
+                        dispatch(Action.IsCookedUpdated(it))
+                    }
+                }
             }
         }
 
@@ -103,6 +114,8 @@ class CookingStoreFactory @Inject constructor(
                     userId = action.newUserId
                     dispatch(Msg.IsFavouriteUpdated(action.isFavourite, action.isFavouriteVisible))
                 }
+
+                is Action.IsCookedUpdated -> dispatch(Msg.IsCookedUpdated(action.isCooked))
             }
         }
 
@@ -113,6 +126,7 @@ class CookingStoreFactory @Inject constructor(
                 CookingStore.Intent.IncreasePortions -> increasePortions()
                 is CookingStore.Intent.SelectStep -> dispatch(Msg.SetStep(portionsCount, intent.step))
                 CookingStore.Intent.ChangeIsFavourite -> changeIsFavourite()
+                CookingStore.Intent.ChangeIsCooked -> changeIsCooked()
             }
         }
 
@@ -151,6 +165,12 @@ class CookingStoreFactory @Inject constructor(
                 }
             }
         }
+
+        private fun changeIsCooked() {
+            scope.launch(Dispatchers.Main) {
+                recipeUseCase.setIsCooked(recipeId, !state().isCooked)
+            }
+        }
     }
 
     private inner class CookingReducer(
@@ -178,6 +198,8 @@ class CookingStoreFactory @Inject constructor(
                         isFavouriteVisible = msg.isFavouriteVisible
                     )
                 }
+
+                is Msg.IsCookedUpdated -> copy(isCooked = msg.isCooked)
             }
         }
 
@@ -200,7 +222,7 @@ class CookingStoreFactory @Inject constructor(
 
         private fun CookingStore.State.recipeToStepContent(recipe: Recipe, stepNumber: Int) = copy(
             content = CookingStore.State.StepContent.Instruction(
-                text = recipe.steps[stepNumber - 1]
+                text = recipe.steps[stepNumber - 1],
             ),
             stepNumber = stepNumber,
             stepCount = recipe.steps.size,
@@ -218,6 +240,8 @@ class CookingStoreFactory @Inject constructor(
             val isFavourite: Boolean,
             val isFavouriteVisible: Boolean
         ): Msg
+
+        data class IsCookedUpdated(val isCooked: Boolean): Msg
     }
 
     private fun Recipe.IngredientUnit.toLabelResId() = when (this) {
@@ -245,6 +269,7 @@ class CookingStoreFactory @Inject constructor(
         imageUrl = recipe.imageUrl,
         isFavourite = false,
         isFavouriteVisible = false,
+        isCooked = false
     )
 
     private fun formatQuantity(quantity: Float): String {

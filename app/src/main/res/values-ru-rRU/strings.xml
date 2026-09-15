@@ -117,4 +117,6 @@
     <string name="unit_liter">л</string>
     <string name="unit_milliliter">мл</string>
     <string name="unit_piece">шт</string>
+    <string name="specify_cooked">Отметить приготовленным</string>
+    <string name="specify_not_cooked">Не приготовлено</string>
 </resources>
