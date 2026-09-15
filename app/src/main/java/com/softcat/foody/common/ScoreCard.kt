@@ -65,7 +65,7 @@ fun ScoreCard(
                 ScoreSelector(
                     modifier = Modifier
                         .weight(2f)
-                        .padding(start = 2.dp, end = 4.dp),
+                        .padding(start = 2.dp),
                     scoreValue = score.score,
                     maxScore = 5,
                     iconSize = 24.dp,

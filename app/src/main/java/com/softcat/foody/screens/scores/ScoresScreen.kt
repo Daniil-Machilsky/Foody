@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,22 +104,25 @@ private fun IsCookedSwitcher(
                 .wrapContentHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Card(
-                modifier = Modifier.weight(1f),
-                onClick = { isCookedChanged(false) },
-                shape = RectangleShape,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.all_scores),
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Center,
-                    color = firstTextColor
-                )
+            CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                Card(
+                    modifier = Modifier.weight(1f),
+                    onClick = { isCookedChanged(false) },
+                    shape = RectangleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.all_scores),
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Center,
+                        color = firstTextColor
+                    )
+                }
             }
+
             Spacer(
                 modifier = Modifier
                     .width(1.dp)
@@ -125,21 +130,24 @@ private fun IsCookedSwitcher(
                     .padding(vertical = 2.dp)
                     .background(MaterialTheme.colorScheme.tertiary)
             )
-            Card(
-                modifier = Modifier.weight(1f),
-                onClick = { isCookedChanged(true) },
-                shape = RectangleShape,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.cooked),
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Center,
-                    color = secondTextColor
-                )
+
+            CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                Card(
+                    modifier = Modifier.weight(1f),
+                    onClick = { isCookedChanged(true) },
+                    shape = RectangleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.cooked),
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Center,
+                        color = secondTextColor
+                    )
+                }
             }
         }
         Row(
