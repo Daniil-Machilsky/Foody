@@ -81,14 +81,14 @@ fun PortionsSelector(
             color = Black,
         )
         Spacer(Modifier.width(8.dp))
-        IncrementButton(portionsIncrement)
+        DecrementButton(portionsDecrement)
         Text(
             text = portions.toString(),
             style = FoodyTypography.headlineSmall,
             color = Black,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-        DecrementButton(portionsDecrement)
+        IncrementButton(portionsIncrement)
     }
 }
 
@@ -159,7 +159,9 @@ fun StepInstruction(
             style= FoodyTypography.bodyLarge,
             color = Black,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
     }
 }
@@ -187,7 +189,8 @@ private fun IngredientDescription(
         Text(
             text = name,
             style = FoodyTypography.labelMedium,
-            color = LightGray
+            color = LightGray,
+            modifier = Modifier.fillMaxWidth(0.7f)
         )
         Spacer(Modifier.weight(1f))
         Text(

@@ -193,10 +193,7 @@ fun CookingTopBar(
     isFavouriteVisible: Boolean = true
 ) {
     TopAppBar(
-        modifier = Modifier.height(64.dp),
-        expandedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight,
-        windowInsets = TopAppBarDefaults.windowInsets
-            .only(WindowInsetsSides.Horizontal),
+        windowInsets = TopAppBarDefaults.windowInsets,
         title = {
             Text(
                 modifier = Modifier.fillMaxWidth(),

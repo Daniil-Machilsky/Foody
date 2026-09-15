@@ -197,7 +197,7 @@ class CookingStoreFactory @Inject constructor(
             ),
             stepNumber = stepNumber,
             stepCount = recipe.steps.size,
-            imageUrl = recipe.stepImages[stepNumber]
+            imageUrl = recipe.stepImages[stepNumber - 1]
         )
     }
 

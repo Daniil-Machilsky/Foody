@@ -331,7 +331,6 @@ private fun UserScoringData(
         Spacer(Modifier.height(32.dp))
         CookRecipeButton(
             onClick = cookRecipeClicked,
-            modifier = Modifier.fillMaxWidth(0.5f)
         )
         Spacer(Modifier.height(16.dp))
         RecipeScore(

@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,7 +64,9 @@ fun CookingContent(
             is CookingStore.State.StepContent.Instruction -> {
                 StepInstruction(
                     text = content.text,
-                    Modifier.padding(horizontal = 16.dp, vertical = 32.dp)
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 32.dp)
                 )
             }
             is CookingStore.State.StepContent.Prepare -> {
@@ -89,10 +90,6 @@ private fun PrepareIngredientsContent(
     portionsIncrement: () -> Unit,
     portionsDecrement: () -> Unit,
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val minListHeight = screenHeight * 0.05f
-    val maxListHeight = screenHeight * 0.4f
-
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -103,7 +100,7 @@ private fun PrepareIngredientsContent(
         Spacer(Modifier.height(16.dp))
         IngredientList(
             ingredients = ingredients,
-            modifier = Modifier.heightIn(min = minListHeight, max = maxListHeight)
+            modifier = Modifier.weight(1f)
         )
         Spacer(Modifier.height(16.dp))
         PortionsSelector(
@@ -111,7 +108,7 @@ private fun PrepareIngredientsContent(
             portionsIncrement = portionsIncrement,
             portionsDecrement = portionsDecrement
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -143,7 +140,7 @@ private fun CookingStep(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
+                .padding(paddingValues)
         ) {
             AsyncImage(
                 model = imageUrl,
