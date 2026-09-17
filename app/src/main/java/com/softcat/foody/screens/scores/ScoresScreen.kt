@@ -33,8 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.softcat.foody.R
-import com.softcat.foody.common.ScoreCard
 import com.softcat.foody.common.ScoresTopBar
+import com.softcat.foody.common.SwipeableScoreCard
 import com.softcat.foody.screens.scores.ScoresStore.State.ContentStatus.Content
 import com.softcat.foody.ui.theme.FoodyTheme
 
@@ -47,7 +47,8 @@ fun ScoresScreen(component: ScoresComponent) {
         back = component::back,
         onScoreClick = component::changeScoreValue,
         onFavouriteButtonClick = component::changeFavouriteStatus,
-        isCookedChanged = component::changeIsCookedFilter
+        isCookedChanged = component::changeIsCookedFilter,
+        onRemoveScore = component::remove
     )
 }
 
@@ -57,7 +58,8 @@ private fun ScoresContent(
     back: () -> Unit,
     onScoreClick: (Int, Int) -> Unit,
     onFavouriteButtonClick: (Int) -> Unit,
-    isCookedChanged: (Boolean) -> Unit
+    isCookedChanged: (Boolean) -> Unit,
+    onRemoveScore: (Int) -> Unit
 ) {
     Scaffold(
         topBar = { ScoresTopBar(back) }
@@ -74,7 +76,8 @@ private fun ScoresContent(
                         modifier = Modifier.padding(top = 16.dp),
                         scores = content.scores,
                         onScoreClick = onScoreClick,
-                        onFavouriteButtonClick = onFavouriteButtonClick
+                        onFavouriteButtonClick = onFavouriteButtonClick,
+                        onRemoveScore = onRemoveScore
                     )
                 }
 
@@ -177,7 +180,8 @@ private fun ScoresList(
     modifier: Modifier = Modifier,
     scores: List<RecipeScoreModel>,
     onScoreClick: (Int, Int) -> Unit,
-    onFavouriteButtonClick: (Int) -> Unit
+    onFavouriteButtonClick: (Int) -> Unit,
+    onRemoveScore: (Int) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -190,11 +194,12 @@ private fun ScoresList(
             items = scores,
             key = { it.id }
         ) { score ->
-            ScoreCard(
+            SwipeableScoreCard(
                 modifier = Modifier,
                 score = score,
                 onScoreClicked = { onScoreClick(score.recipeId, it) },
-                onFavouriteIconClick = { onFavouriteButtonClick(score.recipeId) }
+                onFavouriteIconClick = { onFavouriteButtonClick(score.recipeId) },
+                onRemoveScore = onRemoveScore,
             )
         }
         item {
@@ -251,6 +256,7 @@ fun Scores_Preview() {
             onScoreClick = { _, _ -> },
             onFavouriteButtonClick = {},
             isCookedChanged = {},
+            onRemoveScore = {},
         )
     }
 }
