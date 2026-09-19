@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,8 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.softcat.foody.R
-import com.softcat.foody.common.ScoreCard
 import com.softcat.foody.common.ScoresTopBar
+import com.softcat.foody.common.SwipeableScoreCard
 import com.softcat.foody.screens.scores.ScoresStore.State.ContentStatus.Content
 import com.softcat.foody.ui.theme.FoodyTheme
 
@@ -45,7 +47,8 @@ fun ScoresScreen(component: ScoresComponent) {
         back = component::back,
         onScoreClick = component::changeScoreValue,
         onFavouriteButtonClick = component::changeFavouriteStatus,
-        isCookedChanged = component::changeIsCookedFilter
+        isCookedChanged = component::changeIsCookedFilter,
+        onRemoveScore = component::remove
     )
 }
 
@@ -55,7 +58,8 @@ private fun ScoresContent(
     back: () -> Unit,
     onScoreClick: (Int, Int) -> Unit,
     onFavouriteButtonClick: (Int) -> Unit,
-    isCookedChanged: (Boolean) -> Unit
+    isCookedChanged: (Boolean) -> Unit,
+    onRemoveScore: (Int) -> Unit
 ) {
     Scaffold(
         topBar = { ScoresTopBar(back) }
@@ -72,7 +76,8 @@ private fun ScoresContent(
                         modifier = Modifier.padding(top = 16.dp),
                         scores = content.scores,
                         onScoreClick = onScoreClick,
-                        onFavouriteButtonClick = onFavouriteButtonClick
+                        onFavouriteButtonClick = onFavouriteButtonClick,
+                        onRemoveScore = onRemoveScore
                     )
                 }
 
@@ -102,22 +107,25 @@ private fun IsCookedSwitcher(
                 .wrapContentHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Card(
-                modifier = Modifier.weight(1f),
-                onClick = { isCookedChanged(false) },
-                shape = RectangleShape,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.all_scores),
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Center,
-                    color = firstTextColor
-                )
+            CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                Card(
+                    modifier = Modifier.weight(1f),
+                    onClick = { isCookedChanged(false) },
+                    shape = RectangleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.all_scores),
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Center,
+                        color = firstTextColor
+                    )
+                }
             }
+
             Spacer(
                 modifier = Modifier
                     .width(1.dp)
@@ -125,21 +133,24 @@ private fun IsCookedSwitcher(
                     .padding(vertical = 2.dp)
                     .background(MaterialTheme.colorScheme.tertiary)
             )
-            Card(
-                modifier = Modifier.weight(1f),
-                onClick = { isCookedChanged(true) },
-                shape = RectangleShape,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.cooked),
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Center,
-                    color = secondTextColor
-                )
+
+            CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                Card(
+                    modifier = Modifier.weight(1f),
+                    onClick = { isCookedChanged(true) },
+                    shape = RectangleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.cooked),
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Center,
+                        color = secondTextColor
+                    )
+                }
             }
         }
         Row(
@@ -169,7 +180,8 @@ private fun ScoresList(
     modifier: Modifier = Modifier,
     scores: List<RecipeScoreModel>,
     onScoreClick: (Int, Int) -> Unit,
-    onFavouriteButtonClick: (Int) -> Unit
+    onFavouriteButtonClick: (Int) -> Unit,
+    onRemoveScore: (Int) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -182,11 +194,12 @@ private fun ScoresList(
             items = scores,
             key = { it.id }
         ) { score ->
-            ScoreCard(
+            SwipeableScoreCard(
                 modifier = Modifier,
                 score = score,
                 onScoreClicked = { onScoreClick(score.recipeId, it) },
-                onFavouriteIconClick = { onFavouriteButtonClick(score.recipeId) }
+                onFavouriteIconClick = { onFavouriteButtonClick(score.recipeId) },
+                onRemoveScore = onRemoveScore,
             )
         }
         item {
@@ -243,6 +256,7 @@ fun Scores_Preview() {
             onScoreClick = { _, _ -> },
             onFavouriteButtonClick = {},
             isCookedChanged = {},
+            onRemoveScore = {},
         )
     }
 }
