@@ -7,6 +7,7 @@ import com.softcat.domain.entities.NutritionData
 import com.softcat.domain.entities.Recipe
 import com.softcat.domain.entities.RecipeTag
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class RecipeMapper @Inject constructor(
@@ -45,16 +46,14 @@ class RecipeMapper @Inject constructor(
                 nutrition = NutritionData(
                     calories = model.calories,
                     fat = model.fat,
-                    sugar = model.sugar,
-                    sodium = model.sodium,
                     protein = model.protein,
-                    saturatedFat = model.saturatedFat,
                     carbohydrates = model.carbohydrates
                 ),
-                imageUrl = "",
-                stepImages = List(steps.size) { "" },
-                ingredientQuantity = List(ingredients.size) { 1f },
-                ingredientUnits = List(ingredients.size) { Recipe.IngredientUnit.Piece },
+                imageUrl = model.imageUrl,
+                stepImages = Json.decodeFromString<List<String>>(model.stepImages),
+                ingredientQuantity = Json.decodeFromString<List<Float>>(model.ingredientQuantities),
+                ingredientUnits = Json.decodeFromString<List<String>>(model.ingredientUnits),
+                avgScore = model.avgScore
             )
         }
     }

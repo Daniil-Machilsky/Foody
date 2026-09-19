@@ -6,12 +6,10 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.softcat.domain.entities.Recipe
-import com.softcat.domain.entities.Recipe.IngredientUnit.*
 import com.softcat.domain.entities.User
 import com.softcat.domain.usecases.FavouritesUseCase
 import com.softcat.domain.usecases.RecipeUseCase
 import com.softcat.domain.usecases.UserUseCase
-import com.softcat.foody.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -210,7 +208,7 @@ class CookingStoreFactory @Inject constructor(
                         id = ingredient.id,
                         name = ingredient.name,
                         quantity = formatQuantity(recipe.ingredientQuantity[index] * portions),
-                        unitsResId = recipe.ingredientUnits[index].toLabelResId(),
+                        units = recipe.ingredientUnits[index],
                     )
                 },
                 portions = portions
@@ -244,14 +242,6 @@ class CookingStoreFactory @Inject constructor(
         data class IsCookedUpdated(val isCooked: Boolean): Msg
     }
 
-    private fun Recipe.IngredientUnit.toLabelResId() = when (this) {
-        Piece -> R.string.unit_piece
-        Milliliter -> R.string.unit_milliliter
-        Liter -> R.string.unit_liter
-        Gram -> R.string.unit_gram
-        Kilo -> R.string.unit_kilo
-    }
-
     private fun initialState(recipe: Recipe) = CookingStore.State(
         content = CookingStore.State.StepContent.Prepare(
             ingredients = recipe.ingredients.mapIndexed { index, ingredient ->
@@ -259,7 +249,7 @@ class CookingStoreFactory @Inject constructor(
                     id = ingredient.id,
                     name = ingredient.name,
                     quantity = formatQuantity(recipe.ingredientQuantity[index]),
-                    unitsResId = recipe.ingredientUnits[index].toLabelResId(),
+                    units = recipe.ingredientUnits[index],
                 )
             },
             portions = 1

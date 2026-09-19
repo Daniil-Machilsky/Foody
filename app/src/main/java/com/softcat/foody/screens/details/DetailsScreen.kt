@@ -162,10 +162,7 @@ fun RecipeExtraInfoCard(
     data: NutritionData = NutritionData(
         calories = 1200f,
         fat = 150f,
-        sugar = 20f,
-        sodium = 0f,
         protein = 50f,
-        saturatedFat = 0f,
         carbohydrates = 250f
     ),
     cookingTime: Int = 30
@@ -218,24 +215,10 @@ fun RecipeExtraInfoCard(
             )
             ExtraInfoElement(
                 modifier = Modifier.fillMaxWidth(),
-                iconResId = R.drawable.sugar_icon,
-                labelResId = R.string.sugar,
-                unitsResId = R.string.unit_gram,
-                value = data.sugar.toInt()
-            )
-            ExtraInfoElement(
-                modifier = Modifier.fillMaxWidth(),
                 iconResId = R.drawable.fat_icon,
                 labelResId = R.string.fat,
                 unitsResId = R.string.unit_gram,
                 value = data.fat.toInt()
-            )
-            ExtraInfoElement(
-                modifier = Modifier.fillMaxWidth(),
-                iconResId = R.drawable.fat_icon,
-                labelResId = R.string.saturated_fat,
-                unitsResId = R.string.unit_gram,
-                value = data.saturatedFat.toInt()
             )
         }
     }
@@ -465,16 +448,14 @@ private fun Details_Preview() {
             nutrition = NutritionData(
                 calories = 1190f,
                 fat = 300f,
-                sugar = 500f,
-                sodium = 4f,
                 protein = 5f,
-                saturatedFat = 150f,
                 carbohydrates = 150f
             ),
             imageUrl = "",
             stepImages = emptyList(),
             ingredientQuantity = emptyList(),
             ingredientUnits = emptyList(),
+            avgScore = 3.9f,
         ),
         stepNumber = 1,
         isScoreVisible = true,

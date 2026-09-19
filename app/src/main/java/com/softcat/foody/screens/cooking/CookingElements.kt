@@ -59,7 +59,7 @@ fun IngredientList(
             IngredientDescription(
                 name = ingredient.name,
                 quantity = ingredient.quantity,
-                units = stringResource(ingredient.unitsResId),
+                units = ingredient.units,
                 bottomDivider = index < ingredients.lastIndex
             )
         }
@@ -312,25 +312,25 @@ private fun IngredientList_Preview() {
             id = 1,
             name = "Мука",
             quantity = "200",
-            unitsResId = R.string.unit_gram,
+            units = "г",
         ),
         CookingStore.State.IngredientDescription(
             id = 2,
             name = "Яйца",
             quantity = "2",
-            unitsResId = R.string.unit_piece,
+            units = "шт",
         ),
         CookingStore.State.IngredientDescription(
             id = 3,
             name = "Сахар",
             quantity = "150",
-            unitsResId = R.string.unit_gram,
+            units = "г",
         ),
         CookingStore.State.IngredientDescription(
             id = 4,
             name = "Разрыхлитель",
             quantity = "1.5",
-            unitsResId = R.string.unit_gram,
+            units = "г",
         )
     )
     FoodyTheme {

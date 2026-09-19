@@ -1,6 +1,7 @@
 package com.softcat.database.facade
 
 import com.softcat.database.models.RecipeDbModel
+import kotlinx.serialization.json.Json
 import java.io.EOFException
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -11,25 +12,34 @@ internal fun InputStream.readRecipe() = RecipeDbModel(
     id = readInt32LE(),
     name = readString(),
     description = readString(),
-    steps = readString(),
+    steps = Json.encodeToString<List<String>>(
+        List(readInt32LE()) { readString() }
+    ),
 
-    ingredients = List(readInt32LE()) {
-        readInt32LE()
-    }.joinToString(","),
+    ingredients = Json.encodeToString<List<Int>>(
+        List(readInt32LE()) { readInt32LE() }
+    ),
+    ingredientUnits = Json.encodeToString<List<String>>(
+        List(readInt32LE()) { readString() }
+    ),
+    ingredientQuantities = Json.encodeToString<List<Float>>(
+        List(readInt32LE()) { readFloat32LE() }
+    ),
 
-    tags = List(readInt32LE()) {
-        readInt32LE()
-    }.joinToString(","),
-
-    isCooked = false,
+    tags = Json.encodeToString<List<Int>>(
+        List(readInt32LE()) { readInt32LE() }
+    ),
     minutes = readInt32LE(),
     calories = readFloat32LE(),
-    fat = readFloat32LE(),
-    sugar = readFloat32LE(),
-    sodium = readFloat32LE(),
     protein = readFloat32LE(),
-    saturatedFat = readFloat32LE(),
-    carbohydrates = readFloat32LE()
+    fat = readFloat32LE(),
+    carbohydrates = readFloat32LE(),
+    imageUrl = readString(),
+    stepImages = Json.encodeToString<List<String>>(
+        List(readInt32LE()) { readString() }
+    ),
+    avgScore = readFloat32LE(),
+    isCooked = false,
 )
 
 internal fun InputStream.readInt32LE(): Int {
