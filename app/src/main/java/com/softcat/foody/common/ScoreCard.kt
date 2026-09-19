@@ -62,8 +62,11 @@ fun SwipeableScoreCard(
     LaunchedEffect(dismissState.currentValue) {
         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
             isVisible = false
-            delay(300)
-            onRemoveScore(score.recipeId)
+            try {
+                delay(300)
+            } finally {
+                onRemoveScore(score.recipeId)
+            }
         }
     }
 
