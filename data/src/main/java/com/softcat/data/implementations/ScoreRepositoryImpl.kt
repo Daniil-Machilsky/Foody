@@ -7,8 +7,6 @@ import com.softcat.database.exceptions.ScoresNodeIsAbsentException
 import com.softcat.database.facade.DatabaseFacade
 import com.softcat.domain.entities.Score
 import com.softcat.domain.interfaces.ScoreRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Calendar

@@ -29,6 +29,7 @@
     <string name="find_recipe_navigation_title">Найти рецепт</string>
     <string name="recommend_recipe_navigation_title">Получить ркомендацию</string>
     <string name="need_two_scores_error">Нужно минимум 2 оценки</string>
+    <string name="no_user_error">Сначала нужно войти или зарегистрироваться</string>
 
     <string name="profile_title">Профиль</string>
     <string name="scores">Оценки</string>
