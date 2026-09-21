@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.kotlinx.serialization.json)
     ksp(libs.androidx.room.compiler)
     api(libs.firebase.auth)
     api(libs.aws.android.sdk.s3)

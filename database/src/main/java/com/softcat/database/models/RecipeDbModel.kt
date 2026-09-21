@@ -38,18 +38,24 @@ data class RecipeDbModel(
     @ColumnInfo(name = "fat")
     val fat: Float,
 
-    @ColumnInfo(name = "sugar")
-    val sugar: Float,
-
-    @ColumnInfo(name = "sodium")
-    val sodium: Float,
-
     @ColumnInfo(name = "protein")
     val protein: Float,
 
-    @ColumnInfo(name = "saturatedFat")
-    val saturatedFat: Float,
-
     @ColumnInfo(name = "carbohydrates")
-    val carbohydrates: Float
+    val carbohydrates: Float,
+
+    @ColumnInfo(name = "ingredientUnits")
+    val ingredientUnits: String,
+
+    @ColumnInfo(name = "ingredientQuantities")
+    val ingredientQuantities: String,
+
+    @ColumnInfo(name = "imageUrl")
+    val imageUrl: String,
+
+    @ColumnInfo(name = "stepImages")
+    val stepImages: String,
+
+    @ColumnInfo(name = "avgScore")
+    val avgScore: Float
 )

@@ -5,12 +5,10 @@ import com.softcat.database.facade.readFloat32LE
 import com.softcat.database.facade.readInt32LE
 import com.softcat.database.facade.readRecipe
 import com.softcat.database.facade.readString
-import com.softcat.database.local.dao.AvgScoreDao
 import com.softcat.database.local.dao.IngredientDao
 import com.softcat.database.local.dao.RecipeDao
 import com.softcat.database.local.dao.RecipeVectorDao
 import com.softcat.database.local.dao.TagDao
-import com.softcat.database.models.AvgScoreDbModel
 import com.softcat.database.models.IngredientDbModel
 import com.softcat.database.models.RecipeVectorDbModel
 import com.softcat.database.models.TagDbModel
@@ -31,18 +29,17 @@ class InitializeManagerImpl @Inject constructor(
     private val recipeDao: RecipeDao,
     private val ingredientDao: IngredientDao,
     private val tagDao: TagDao,
-    private val avgScoreDao: AvgScoreDao,
     private val recipeVectorDao: RecipeVectorDao
 ): InitializeManager {
 
     private val scope =  CoroutineScope(Dispatchers.IO)
 
     override suspend fun initializeRecipes(requiredCount: Int): Result<Unit> {
-        recipeDao.clear()
-        tagDao.clear()
-        ingredientDao.clear()
-
         return try {
+            recipeDao.clear()
+            tagDao.clear()
+            ingredientDao.clear()
+
             downloadFileAndProcess(TAGS_FILE_URL) { stream ->
                 val tags = List(stream.readInt32LE()) {
                     TagDbModel(stream.readInt32LE(), stream.readString())
@@ -87,34 +84,6 @@ class InitializeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun initializeAvgScores(): Result<Unit> {
-        avgScoreDao.clear()
-        val recipeIds = recipeDao.getRecipesIds()
-
-        return try {
-            downloadFileAndProcess(AVG_SCORES_FILE_URL) { stream ->
-                var n = stream.readInt32LE()
-                val chunkSize = min(1000, n / 5)
-                while (n > 0) {
-                    val count = min(chunkSize, n)
-                    val scores = List(count) {
-                        AvgScoreDbModel(
-                            recipeId = stream.readInt32LE(),
-                            value = stream.readFloat32LE()
-                        )
-                    }.filter {
-                        it.recipeId in recipeIds
-                    }
-                    avgScoreDao.insertAll(scores)
-                    n -= count
-                }
-            }
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     private suspend fun readRecipes(stream: InputStream, requiredCount: Int) {
         var n = stream.readInt32LE()
         n = min(n, requiredCount)
@@ -131,14 +100,17 @@ class InitializeManagerImpl @Inject constructor(
 
     private suspend fun readRecipeVectors(stream: InputStream) {
         BufferedInputStream(stream, 64 * 1024).use { buffered ->
-            var n = 1045
+            val totalRecipes = stream.readInt32LE()
+            val featureCount = stream.readInt32LE()
+
+            var n = totalRecipes
             val chunkSize = 500
             while (n > 0) {
                 val count = min(chunkSize, n)
                 val recipeVectors = List(count) {
                     RecipeVectorDbModel(
                         id = buffered.readInt32LE(),
-                        vector = List(2999) { buffered.readFloat32LE() }
+                        vector = List(featureCount) { buffered.readFloat32LE() }
                     )
                 }
                 recipeVectorDao.insertAll(recipeVectors)
@@ -173,7 +145,6 @@ class InitializeManagerImpl @Inject constructor(
         private val TAGS_FILE_URL = URL_PATTERN.format("tags")
         private val INGREDIENTS_FILE_URL = URL_PATTERN.format("ingredients")
         private val RECIPES_FILE_URL = URL_PATTERN.format("recipes")
-        private val AVG_SCORES_FILE_URL = URL_PATTERN.format("avg_scores")
         private val RECIPE_VECTORS_URL = URL_PATTERN.format("recipe_vectors")
     }
 }

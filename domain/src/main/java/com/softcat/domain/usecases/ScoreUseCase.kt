@@ -28,14 +28,4 @@ class ScoreUseCase @Inject constructor(
         Timber.i("${this::class.simpleName} observeScoreValue($userId, $recipeId) invoked")
         return repository.observeScoreValue(userId, recipeId)
     }
-
-    suspend fun observeScoresMap(userId: String): StateFlow<Map<Int, Int>> {
-        Timber.i("${this::class.simpleName} observeScoresMap($userId) invoked")
-        return repository.observeScoresMap(userId)
-    }
-
-    suspend fun getAvgScores(ids: List<Int>): Map<Int, Float> {
-        Timber.i("${this::class.simpleName} getAvgScores(List(${ids.size})) invoked")
-        return repository.getAvgScores(ids)
-    }
 }

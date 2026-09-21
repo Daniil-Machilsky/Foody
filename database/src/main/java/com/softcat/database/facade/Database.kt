@@ -1,7 +1,6 @@
 package com.softcat.database.facade
 
 import android.net.Uri
-import com.softcat.database.local.dao.AvgScoreDao
 import com.softcat.database.local.dao.IngredientDao
 import com.softcat.database.models.RecipeDbModel
 import com.softcat.database.models.ScoreDbModel
@@ -25,7 +24,6 @@ class Database @Inject constructor(
     private val recipeDao: RecipeDao,
     private val ingredientDao: IngredientDao,
     private val tagDao: TagDao,
-    private val avgScoreDao: AvgScoreDao,
     private val recipeVectorDao: RecipeVectorDao,
     private val initializeManager: InitializeManager
 ): DatabaseFacade {
@@ -128,9 +126,6 @@ class Database @Inject constructor(
         initializeManager.initializeRecipes(requiredCount).getOrElse {
             return Result.failure(it)
         }
-        initializeManager.initializeAvgScores().getOrElse {
-            return Result.failure(it)
-        }
         initializeManager.initializeRecommendationModel().getOrElse {
             return Result.failure(it)
         }
@@ -168,14 +163,6 @@ class Database @Inject constructor(
     }
 
     override suspend fun isRecipeCooked(recipeId: Int) = recipeDao.isCooked(recipeId)
-
-    override suspend fun getAvgScores(ids: List<Int>): Map<Int, Float> {
-        return mutableMapOf<Int, Float>().apply {
-            avgScoreDao.getAll(ids).forEach {
-                this[it.recipeId] = it.value
-            }
-        }
-    }
 
     override suspend fun exit() {
         usersManager.exit()

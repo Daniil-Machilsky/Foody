@@ -15,7 +15,6 @@ import com.softcat.domain.entities.User
 import com.softcat.domain.usecases.FavouritesUseCase
 import com.softcat.domain.usecases.IngredientUseCase
 import com.softcat.domain.usecases.RecipeTagUseCase
-import com.softcat.domain.usecases.ScoreUseCase
 import com.softcat.domain.usecases.UserUseCase
 import com.softcat.foody.common.RecipeModel
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +27,6 @@ import javax.inject.Inject
 class FavouritesStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
     private val favouritesUseCase: FavouritesUseCase,
-    private val scoreUseCase: ScoreUseCase,
     private val userUseCase: UserUseCase,
     private val ingredientUseCase: IngredientUseCase,
     private val tagsUseCase: RecipeTagUseCase
@@ -79,10 +77,8 @@ class FavouritesStoreFactory @Inject constructor(
         lifecycle: Lifecycle
     ): CoroutineExecutor<FavouritesStore.Intent, Action, FavouritesStore.State, Msg, FavouritesStore.Label>() {
 
-        private var scores: Map<Int, Int>? = null
         private var favourites: List<Recipe>? = null
 
-        private var scoresCollectingJob: Job? = null
         private var favouritesCollectingJob: Job? = null
         private var userCollectingJob: Job? = null
 
@@ -96,11 +92,9 @@ class FavouritesStoreFactory @Inject constructor(
                 }
             }
             lifecycle.doOnStop {
-                scoresCollectingJob?.cancel()
                 favouritesCollectingJob?.cancel()
                 userCollectingJob?.cancel()
 
-                scoresCollectingJob = null
                 favouritesCollectingJob = null
                 userCollectingJob = null
             }
@@ -170,23 +164,16 @@ class FavouritesStoreFactory @Inject constructor(
             user = newUser
             val userId = user?.id
             favouritesCollectingJob?.cancel()
-            scoresCollectingJob?.cancel()
 
             if (userId == null) {
                 withContext(Dispatchers.Main) {
                     dispatch(Msg.UserIsAbsent)
                 }
                 favouritesCollectingJob = null
-                scoresCollectingJob = null
             } else {
                 favouritesCollectingJob = scope.launch(Dispatchers.IO) {
                     favouritesUseCase.observe(userId).collect {
                         withContext(Dispatchers.Main) { updateFavourites(it) }
-                    }
-                }
-                scoresCollectingJob = scope.launch(Dispatchers.IO) {
-                    scoreUseCase.observeScoresMap(userId).collect {
-                        withContext(Dispatchers.Main) { updateScores(it) }
                     }
                 }
             }
@@ -194,7 +181,7 @@ class FavouritesStoreFactory @Inject constructor(
 
         private fun updateFilterParams(params: FilterParams) {
             dispatch(Msg.UpdateFilterParams(params))
-            val recipes = mapToRecipeModels(favourites, scores, params)
+            val recipes = mapToRecipeModels(favourites, params)
             dispatch(Msg.FavouritesLoaded(recipes))
         }
 
@@ -238,19 +225,6 @@ class FavouritesStoreFactory @Inject constructor(
             } else {
                 val recipes = mapToRecipeModels(
                     recipes = favourites.orEmpty(),
-                    scores = scores,
-                    filterParams = state().filtersStatus.filterParameters
-                )
-                dispatch(Msg.FavouritesLoaded(recipes))
-            }
-        }
-
-        private fun updateScores(newScores: Map<Int, Int>) {
-            scores = newScores
-            if (state().contentStatus is FavouritesStore.State.ContentStatus.RecipeList) {
-                val recipes = mapToRecipeModels(
-                    recipes = favourites.orEmpty(),
-                    scores = newScores,
                     filterParams = state().filtersStatus.filterParameters
                 )
                 dispatch(Msg.FavouritesLoaded(recipes))
@@ -311,12 +285,11 @@ class FavouritesStoreFactory @Inject constructor(
 
     fun mapToRecipeModels(
         recipes: List<Recipe>?,
-        scores: Map<Int, Int>?,
         filterParams: FilterParams
     ): List<RecipeModel> {
         return recipes
             .orEmpty()
-            .filter(filterParams, scores?.map { it.key to it.value.toFloat() }?.toMap())
+            .filter(filterParams)
             .map { recipe ->
                 RecipeModel(
                     id = recipe.id,
@@ -325,8 +298,8 @@ class FavouritesStoreFactory @Inject constructor(
                     ingredients = recipe.ingredients.map { it.name },
                     name = recipe.name,
                     description = recipe.description,
-                    score = (scores?.get(recipe.id) ?: 0).toString(),
-                    scoreVisible = scores?.contains(recipe.id) ?: false
+                    score = "%.2f".format(recipe.avgScore),
+                    scoreVisible = true
                 )
             }
     }

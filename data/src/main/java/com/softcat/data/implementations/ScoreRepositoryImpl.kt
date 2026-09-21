@@ -10,10 +10,7 @@ import com.softcat.domain.interfaces.ScoreRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -23,19 +20,9 @@ class ScoreRepositoryImpl @Inject constructor(
 
     private var selectedUserId: String? = null
     private var selectedRecipeId: Int? = null
-    private val scope = CoroutineScope(Dispatchers.IO)
 
     private val scoreListFlow = MutableStateFlow<List<Score>>(emptyList())
     private val scoreValueFlow = MutableStateFlow(0)
-
-    private val scoresMapFlow: StateFlow<Map<Int, Int>> = scoreListFlow
-        .map { scores ->
-            scores.associateBy({ it.recipeId }, { it.value })
-        }.stateIn(
-            scope = scope,
-            started = SharingStarted.Lazily,
-            initialValue = emptyMap()
-        )
 
     override suspend fun saveScore(
         userId: String,
@@ -74,14 +61,6 @@ class ScoreRepositoryImpl @Inject constructor(
         updateFlows()
         return scoreValueFlow
     }
-
-    override suspend fun observeScoresMap(userId: String): StateFlow<Map<Int, Int>> {
-        selectedUserId = userId
-        updateFlows()
-        return scoresMapFlow
-    }
-
-    override suspend fun getAvgScores(ids: List<Int>) = database.getAvgScores(ids)
 
     private suspend fun updateFlows() {
         val userId = selectedUserId ?: return

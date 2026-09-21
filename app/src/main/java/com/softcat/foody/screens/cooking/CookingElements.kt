@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -59,7 +60,7 @@ fun IngredientList(
             IngredientDescription(
                 name = ingredient.name,
                 quantity = ingredient.quantity,
-                units = stringResource(ingredient.unitsResId),
+                units = ingredient.units,
                 bottomDivider = index < ingredients.lastIndex
             )
         }
@@ -190,19 +191,25 @@ private fun IngredientDescription(
             text = name,
             style = FoodyTypography.labelMedium,
             color = LightGray,
-            modifier = Modifier.fillMaxWidth(0.7f)
+            modifier = Modifier.fillMaxWidth(0.5f),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 2
         )
         Spacer(Modifier.weight(1f))
         Text(
             text = quantity,
             style = FoodyTypography.labelMedium,
-            color = LightGray
+            color = LightGray,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
         )
         Spacer(Modifier.width(4.dp))
         Text(
             text = units,
             style = FoodyTypography.labelMedium,
-            color = LightGray
+            color = LightGray,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
         )
         Spacer(Modifier.width(8.dp))
     }
@@ -312,25 +319,25 @@ private fun IngredientList_Preview() {
             id = 1,
             name = "Мука",
             quantity = "200",
-            unitsResId = R.string.unit_gram,
+            units = "г",
         ),
         CookingStore.State.IngredientDescription(
             id = 2,
             name = "Яйца",
             quantity = "2",
-            unitsResId = R.string.unit_piece,
+            units = "шт",
         ),
         CookingStore.State.IngredientDescription(
             id = 3,
             name = "Сахар",
             quantity = "150",
-            unitsResId = R.string.unit_gram,
+            units = "г",
         ),
         CookingStore.State.IngredientDescription(
             id = 4,
             name = "Разрыхлитель",
             quantity = "1.5",
-            unitsResId = R.string.unit_gram,
+            units = "г",
         )
     )
     FoodyTheme {

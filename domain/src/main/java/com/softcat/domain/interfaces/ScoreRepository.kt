@@ -12,8 +12,4 @@ interface ScoreRepository {
     suspend fun observeScores(userId: String): StateFlow<List<Score>>
 
     suspend fun observeScoreValue(userId: String, recipeId: Int): StateFlow<Int>
-
-    suspend fun observeScoresMap(userId: String): StateFlow<Map<Int, Int>>
-
-    suspend fun getAvgScores(ids: List<Int>): Map<Int, Float>
 }

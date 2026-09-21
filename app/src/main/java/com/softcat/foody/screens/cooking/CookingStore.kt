@@ -17,7 +17,7 @@ interface CookingStore: Store<CookingStore.Intent, CookingStore.State, Nothing> 
             val id: Int,
             val name: String,
             val quantity: String,
-            val unitsResId: Int
+            val units: String
         )
 
         sealed interface StepContent {

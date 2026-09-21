@@ -4,6 +4,4 @@ interface InitializeManager {
     suspend fun initializeRecipes(requiredCount: Int): Result<Unit>
 
     suspend fun initializeRecommendationModel(): Result<Unit>
-
-    suspend fun initializeAvgScores(): Result<Unit>
 }

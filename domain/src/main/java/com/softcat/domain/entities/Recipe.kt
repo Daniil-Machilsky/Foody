@@ -16,11 +16,6 @@ data class Recipe(
     val imageUrl: String,
     val stepImages: List<String>,
     val ingredientQuantity: List<Float>,
-    val ingredientUnits: List<IngredientUnit>
-) {
-    enum class IngredientUnit {
-        Piece,
-        Milliliter, Liter,
-        Gram, Kilo,
-    }
-}
+    val ingredientUnits: List<String>,
+    val avgScore: Float
+)

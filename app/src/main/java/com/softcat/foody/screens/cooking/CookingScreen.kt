@@ -1,6 +1,7 @@
 package com.softcat.foody.screens.cooking
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -182,15 +183,11 @@ private fun CookingStep(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = null,
+            CookingStepImage(
+                imageUrl = imageUrl,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 256.dp)
-                    .padding(top = 4.dp),
-                contentScale = ContentScale.Fit,
-                placeholder = painterResource(R.drawable.hat_smile_image),
+                    .heightIn(max = 256.dp),
             )
             Box(
                 modifier = Modifier.weight(1f),
@@ -203,6 +200,29 @@ private fun CookingStep(
             )
             Spacer(Modifier.height(16.dp))
         }
+    }
+}
+
+@Composable
+private fun CookingStepImage(
+    imageUrl: String,
+    modifier: Modifier = Modifier,
+) {
+    if (imageUrl.isEmpty()) {
+        Image(
+            modifier = modifier.padding(top = 4.dp),
+            contentDescription = null,
+            painter = painterResource(R.drawable.hat_smile_image),
+            contentScale = ContentScale.Fit,
+        )
+    } else {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            modifier = modifier,
+            contentScale = ContentScale.Fit,
+            placeholder = painterResource(R.drawable.hat_smile_image),
+        )
     }
 }
 
@@ -246,31 +266,31 @@ private fun CookingContent_PrepareStep_Preview() {
                     id = 1,
                     name = "Какао",
                     quantity = "500",
-                    unitsResId = R.string.unit_gram,
+                    units = "г",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 2,
                     name = "Сахар",
                     quantity = "200",
-                    unitsResId = R.string.unit_gram,
+                    units = "г",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 3,
                     name = "Яйца",
                     quantity = "1",
-                    unitsResId = R.string.unit_piece,
+                    units = "шт",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 4,
                     name = "Молоко",
                     quantity = "200",
-                    unitsResId = R.string.unit_milliliter,
+                    units = "мл",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 5,
                     name = "Разрыхлитель",
                     quantity = "2",
-                    unitsResId = R.string.unit_gram,
+                    units = "г",
                 )
             ),
             portions = 1
@@ -307,31 +327,31 @@ private fun PrepareIngredientsContent_Preview() {
                     id = 1,
                     name = "Какао",
                     quantity = "500",
-                    unitsResId = R.string.unit_gram,
+                    units = "г",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 2,
                     name = "Сахар",
                     quantity = "200",
-                    unitsResId = R.string.unit_gram,
+                    units = "г",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 3,
                     name = "Яйца",
                     quantity = "1",
-                    unitsResId = R.string.unit_piece,
+                    units = "шт",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 4,
                     name = "Молоко",
                     quantity = "200",
-                    unitsResId = R.string.unit_milliliter,
+                    units = "мл",
                 ),
                 CookingStore.State.IngredientDescription(
                     id = 5,
                     name = "Разрыхлитель",
                     quantity = "2",
-                    unitsResId = R.string.unit_gram,
+                    units = "г",
                 )
             ),
             portionsIncrement = {},
