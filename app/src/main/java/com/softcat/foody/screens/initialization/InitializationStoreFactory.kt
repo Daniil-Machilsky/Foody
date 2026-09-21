@@ -122,11 +122,15 @@ class InitializationStoreFactory @Inject constructor(
             OptionModel(
                 title = application
                     .getString(R.string.add_recipes_title)
-                    .format(1045),
+                    .format(RECIPE_COUNT),
                 text = application.getString(R.string.small_db_description),
-                value = 1045,
+                value = RECIPE_COUNT,
                 isSelected = false
             )
         )
+    }
+
+    companion object {
+        private const val RECIPE_COUNT = 2058
     }
 }

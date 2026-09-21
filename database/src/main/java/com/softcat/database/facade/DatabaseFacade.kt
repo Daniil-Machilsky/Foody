@@ -73,8 +73,6 @@ interface DatabaseFacade {
 
     suspend fun isRecipeCooked(recipeId: Int): Boolean
 
-    suspend fun getAvgScores(ids: List<Int>): Map<Int, Float>
-
     suspend fun exit()
 
     suspend fun getRecipeVectors(recipeIds: List<Int>): Pair<List<Int>, List<RecipeVectorDbModel>>

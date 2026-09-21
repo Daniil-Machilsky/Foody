@@ -263,6 +263,9 @@ class CookingStoreFactory @Inject constructor(
     )
 
     private fun formatQuantity(quantity: Float): String {
+        if (quantity <= 0f) {
+            return "по вкусу"
+        }
         val symbols = DecimalFormatSymbols(Locale.getDefault())
         val df = DecimalFormat("#.##", symbols)
         return df.format(quantity)

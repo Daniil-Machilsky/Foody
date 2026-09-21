@@ -25,15 +25,13 @@ class RecipeMapper @Inject constructor(
             initialize()
 
         return recipeModels.map { model ->
-            val ingredients = model.ingredients
-                .split(",")
-                .mapNotNull { id -> ingredientMap[id.toInt()] }
+            val ingredients = Json.decodeFromString<List<Int>>(model.ingredients)
+                .mapNotNull { id -> ingredientMap[id] }
 
-            val tags = model.tags
-                .split(",")
-                .mapNotNull { id -> tagMap[id.toInt()] }
+            val tags = Json.decodeFromString<List<Int>>(model.tags)
+                .mapNotNull { id -> tagMap[id] }
 
-            val steps = model.steps.split("|")
+            val steps = Json.decodeFromString<List<String>>(model.steps)
             Recipe(
                 id = model.id,
                 name = model.name,

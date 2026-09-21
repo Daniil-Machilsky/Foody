@@ -16,7 +16,6 @@ import com.softcat.domain.usecases.FavouritesUseCase
 import com.softcat.domain.usecases.IngredientUseCase
 import com.softcat.domain.usecases.RecipeTagUseCase
 import com.softcat.domain.usecases.RecipeUseCase
-import com.softcat.domain.usecases.ScoreUseCase
 import com.softcat.domain.usecases.UserUseCase
 import com.softcat.foody.common.RecipeModel
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +32,6 @@ class SearchStoreFactory @Inject constructor(
     private val ingredientUseCase: IngredientUseCase,
     private val tagUseCase: RecipeTagUseCase,
     private val userUseCase: UserUseCase,
-    private val scoreUseCase: ScoreUseCase,
 ) {
     private var user: User? = null
 
@@ -81,10 +79,7 @@ class SearchStoreFactory @Inject constructor(
 
         data class TagsLoaded(val tags: List<String>): Action
 
-        data class InitialRecipeSampleLoaded(
-            val recipes: List<Recipe>,
-            val scores: Map<Int, Float>
-        ): Action
+        data class InitialRecipeSampleLoaded(val recipes: List<Recipe>): Action
     }
 
     private inner class SearchBootstrapper: CoroutineBootstrapper<Action>() {
@@ -99,9 +94,8 @@ class SearchStoreFactory @Inject constructor(
                     dispatch(Action.TagsLoaded(tags))
                 }
                 val initialSearchResult = recipeUseCase.search("")
-                val avgScores = scoreUseCase.getAvgScores(initialSearchResult.map { it.id })
                 withContext(Dispatchers.Main) {
-                    dispatch(Action.InitialRecipeSampleLoaded(initialSearchResult, avgScores))
+                    dispatch(Action.InitialRecipeSampleLoaded(initialSearchResult))
                 }
             }
         }
@@ -112,7 +106,6 @@ class SearchStoreFactory @Inject constructor(
     ): CoroutineExecutor<SearchStore.Intent, Action, SearchStore.State, Msg, SearchStore.Label>() {
 
         private var savedSearchResult: List<Recipe>? = null
-        private var savedAvgScores: Map<Int, Float>? = null
         private var favouriteIds: Set<Int>? = null
 
         private var userCollectingJob: Job? = null
@@ -200,7 +193,7 @@ class SearchStoreFactory @Inject constructor(
 
         private fun updateFilterParams(params: FilterParams) {
             dispatch(Msg.ChangeFilterParams(params))
-            val recipes = mapToRecipeModels(savedSearchResult, savedAvgScores, favouriteIds, params)
+            val recipes = mapToRecipeModels(savedSearchResult, favouriteIds, params)
             if (state().searchStatus !is SearchStore.State.SearchStatus.Initial)
                 dispatch(Msg.ChangeSearchContent(recipes))
         }
@@ -250,17 +243,15 @@ class SearchStoreFactory @Inject constructor(
                     dispatch(Msg.TagsSuggestionChanged(action.tags))
                 }
                 is Action.InitialRecipeSampleLoaded ->
-                    initialRecipeSampleLoaded(action.recipes, action.scores)
+                    initialRecipeSampleLoaded(action.recipes)
             }
         }
 
-        private fun initialRecipeSampleLoaded(recipes: List<Recipe>, scores: Map<Int, Float>) {
+        private fun initialRecipeSampleLoaded(recipes: List<Recipe>) {
             if (state().searchStatus is SearchStore.State.SearchStatus.Initial) {
                 savedSearchResult = recipes
-                savedAvgScores = scores
                 val recipesModels = mapToRecipeModels(
                     recipes,
-                    scores,
                     favouriteIds,
                     state().filtersState.filterParameters
                 )
@@ -272,14 +263,11 @@ class SearchStoreFactory @Inject constructor(
             dispatch(Msg.LoadingStarted)
             scope.launch(Dispatchers.IO) {
                 val searchResult = recipeUseCase.search(query)
-                val avgScores = scoreUseCase.getAvgScores(searchResult.map { it.id })
                 savedSearchResult = searchResult
-                savedAvgScores = avgScores
 
                 withContext(Dispatchers.Main) {
                     val recipes = mapToRecipeModels(
                         recipes = searchResult,
-                        scores = avgScores,
                         favourites = favouriteIds,
                         filterParams = state().filtersState.filterParameters
                     )
@@ -307,7 +295,6 @@ class SearchStoreFactory @Inject constructor(
             if (state().searchStatus is SearchStore.State.SearchStatus.Content) {
                 val recipes = mapToRecipeModels(
                     recipes = savedSearchResult.orEmpty(),
-                    scores = savedAvgScores,
                     favourites = favourites,
                     filterParams = state().filtersState.filterParameters
                 )
@@ -350,13 +337,12 @@ class SearchStoreFactory @Inject constructor(
 
     fun mapToRecipeModels(
         recipes: List<Recipe>?,
-        scores: Map<Int, Float>?,
         favourites: Set<Int>?,
         filterParams: FilterParams
     ): List<RecipeModel> {
         return recipes
             .orEmpty()
-            .filter(filterParams, scores)
+            .filter(filterParams)
             .map { recipe ->
                 RecipeModel(
                     id = recipe.id,
@@ -365,8 +351,8 @@ class SearchStoreFactory @Inject constructor(
                     ingredients = recipe.ingredients.map { it.name },
                     name = recipe.name,
                     description = recipe.description,
-                    score ="%.2f".format(scores?.get(recipe.id) ?: 0f),
-                    scoreVisible = scores?.contains(recipe.id) ?: false
+                    score = "%.2f".format(recipe.avgScore),
+                    scoreVisible = true
                 )
             }
     }

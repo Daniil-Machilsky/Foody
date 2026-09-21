@@ -6,13 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.softcat.database.DatabaseRules
-import com.softcat.database.local.dao.AvgScoreDao
 import com.softcat.database.local.dao.IngredientDao
 import com.softcat.database.local.dao.RecipeDao
 import com.softcat.database.local.dao.RecipeVectorDao
 import com.softcat.database.local.dao.ScoreDao
 import com.softcat.database.local.dao.TagDao
-import com.softcat.database.models.AvgScoreDbModel
 import com.softcat.database.models.IngredientDbModel
 import com.softcat.database.models.RecipeDbModel
 import com.softcat.database.models.RecipeVectorDbModel
@@ -25,7 +23,6 @@ import com.softcat.database.models.VectorConverters
         RecipeDbModel::class,
         IngredientDbModel::class,
         TagDbModel::class,
-        AvgScoreDbModel::class,
         RecipeVectorDbModel::class,
         ScoreDbModel::class
     ],
@@ -41,8 +38,6 @@ abstract class FoodyDatabase : RoomDatabase() {
     abstract fun getScoresDao(): ScoreDao
 
     abstract fun getTagDao(): TagDao
-
-    abstract fun getAvgScoreDao(): AvgScoreDao
 
     companion object {
 

@@ -398,14 +398,16 @@ private fun DetailsContent(
                 showAddButton = false
             )
             Spacer(Modifier.height(16.dp))
-            RecipeStep(
-                modifier = Modifier.heightIn(min = screenHeight * 0.1f, max = screenHeight * 0.25f),
-                stepNumber = state.stepNumber,
-                stepCount = state.recipe.steps.size,
-                step = state.recipe.steps[state.stepNumber - 1],
-                onPreviousStepClicked = previousStep,
-                onNextStepClicked = nextStep
-            )
+            if (state.recipe.steps.isNotEmpty()) {
+                RecipeStep(
+                    modifier = Modifier.heightIn(min = screenHeight * 0.1f, max = screenHeight * 0.25f),
+                    stepNumber = state.stepNumber,
+                    stepCount = state.recipe.steps.size,
+                    step = state.recipe.steps[state.stepNumber - 1],
+                    onPreviousStepClicked = previousStep,
+                    onNextStepClicked = nextStep
+                )
+            }
             Spacer(Modifier.height(16.dp))
             RecipeExtraInfoCard(
                 modifier = Modifier.wrapContentHeight(),
