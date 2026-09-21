@@ -44,10 +44,10 @@ class RecommendComponentImpl @AssistedInject constructor(
         when (label) {
             is RecommendStore.Label.OpenRecipeDetails -> openRecipeDetailsCallback(label.recipe)
             is RecommendStore.Label.Error -> {
-                val msg = if (label.error is NoScoresException) {
-                    application.getString(R.string.need_two_scores_error)
-                } else {
-                    "Error: " + label.error.message.orEmpty()
+                val msg = when (label.error) {
+                    is NoScoresException -> application.getString(R.string.need_two_scores_error)
+                    is NoUserException -> application.getString(R.string.no_user_error)
+                    else -> "Error: " + label.error.message.orEmpty()
                 }
                 Toast.makeText(application, msg, Toast.LENGTH_SHORT).show()
             }

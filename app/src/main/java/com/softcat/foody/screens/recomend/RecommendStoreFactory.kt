@@ -192,7 +192,11 @@ class RecommendStoreFactory
         }
 
         private fun makeRecipesRecommendation() {
-            val userId = currentUser?.id ?: return
+            val userId = currentUser?.id
+            if (userId == null) {
+                publish(RecommendStore.Label.Error(NoUserException()))
+                return
+            }
             dispatch(Msg.RecommendationLoading)
             scope.launch(Dispatchers.Default) {
                 val scores = scoreUseCase.observe(userId).first()

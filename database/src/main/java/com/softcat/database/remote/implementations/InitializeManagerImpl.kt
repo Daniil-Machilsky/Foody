@@ -73,8 +73,8 @@ class InitializeManagerImpl @Inject constructor(
     }
 
     override suspend fun initializeRecommendationModel(): Result<Unit> {
-        recipeVectorDao.clear()
         return try {
+            recipeVectorDao.clear()
             downloadFileAndProcess(RECIPE_VECTORS_URL) { stream ->
                 readRecipeVectors(stream)
             }

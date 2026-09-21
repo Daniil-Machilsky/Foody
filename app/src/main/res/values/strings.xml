@@ -29,6 +29,7 @@
     <string name="find_recipe_navigation_title">Find recipe</string>
     <string name="recommend_recipe_navigation_title">Get recommendation</string>
     <string name="need_two_scores_error">Make at least 2 scores</string>
+    <string name="no_user_error">Firstly authorize. Register or enter an account</string>
 
     <string name="profile_title">Profile</string>
     <string name="scores">Scores</string>
