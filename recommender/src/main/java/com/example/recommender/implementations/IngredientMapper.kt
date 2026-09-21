@@ -15,7 +15,7 @@ fun Int.toIngredientCategory() = when (this) {
     2 -> IngredientCategory.Dairy
     3 -> IngredientCategory.MeatAndFish
     4 -> IngredientCategory.Sweet
-    5 -> IngredientCategory.FruitAndVegetables
-    6 -> IngredientCategory.SpiceAndSauce
+    5 -> IngredientCategory.SpiceAndSauce
+    6 -> IngredientCategory.FruitAndVegetables
     else -> IngredientCategory.Other
 }
