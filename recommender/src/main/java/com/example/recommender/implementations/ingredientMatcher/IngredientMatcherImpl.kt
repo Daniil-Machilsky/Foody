@@ -1,17 +1,22 @@
 package com.example.recommender.implementations.ingredientMatcher
 
+import com.softcat.domain.entities.Ingredient
 import javax.inject.Inject
 
 class IngredientMatcherImpl @Inject constructor(): IngredientMatcher {
+
     /**
      * Основная функция сравнения двух ингредиентов
      * @param ingredient1 первый ингредиент
      * @param ingredient2 второй ингредиент
      * @return true если ингредиенты считаются одинаковыми, false иначе
      */
-    override fun equal(ingredient1: String, ingredient2: String): Boolean {
-        val formattedIngr1 = formatIngredient(ingredient1)
-        val formattedIngr2 = formatIngredient(ingredient2)
+    override fun equal(ingredient1: Ingredient, ingredient2: Ingredient): Boolean {
+        if (ingredient1.category != ingredient2.category)
+            return false
+
+        val formattedIngr1 = formatIngredient(ingredient1.name)
+        val formattedIngr2 = formatIngredient(ingredient2.name)
 
         var a = formattedIngr1.split("\\s+".toRegex()).filter { it.isNotEmpty() }
         var b = formattedIngr2.split("\\s+".toRegex()).filter { it.isNotEmpty() }

@@ -126,9 +126,9 @@ class RecommendationManagerImpl @Inject constructor(
             var missIngredient = 0
             var i = 0
             while (i < recipe.ingredients.size && missIngredient <= maxAbsentIngredients) {
-                val ingredientName = recipe.ingredients[i].name
+                val ingredient = recipe.ingredients[i]
                 val match = ingredients.any {
-                    matcher.equal(ingredientName, it.name)
+                    matcher.equal(ingredient, it)
                 }
                 if (!match)
                     ++missIngredient
