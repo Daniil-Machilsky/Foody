@@ -1,6 +1,8 @@
 package com.example.recommender
 
 import com.example.recommender.implementations.ingredientMatcher.IngredientMatcherImpl
+import com.softcat.domain.entities.Ingredient
+import com.softcat.domain.entities.IngredientCategory
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -15,7 +17,9 @@ class IngredientMatcherTest {
     private val matcher = IngredientMatcherImpl()
 
     private fun checkCase(a: String, b: String, answer: Boolean) {
-        assertEquals(answer, matcher.equal(a, b))
+        val i1 = Ingredient(1, a, IngredientCategory.Other)
+        val i2 = Ingredient(2, b, IngredientCategory.Other)
+        assertEquals(answer, matcher.equal(i1, i2))
     }
 
     @Test
