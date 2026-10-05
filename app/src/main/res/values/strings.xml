@@ -75,7 +75,7 @@
     <string name="saturated_fat">Saturated fat</string>
     <string name="protein">Protein</string>
     <string name="carbohydrates">Carbohydrates</string>
-    <string name="cooking_time">Cooking time</string>
+    <string name="cooking_time">Time</string>
     <string name="nutrition_data_title">Extra information</string>
     <string name="is_cooked">Is cooked</string>
     <string name="score">Score</string>

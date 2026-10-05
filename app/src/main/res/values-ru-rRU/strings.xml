@@ -75,7 +75,7 @@
     <string name="saturated_fat">Насыщенные жиры</string>
     <string name="protein">Белки</string>
     <string name="carbohydrates">Углеводы</string>
-    <string name="cooking_time">Время приготовления</string>
+    <string name="cooking_time">Время</string>
     <string name="nutrition_data_title">Дополнительная информация</string>
     <string name="is_cooked">Приготовлено</string>
     <string name="score">Оценка</string>

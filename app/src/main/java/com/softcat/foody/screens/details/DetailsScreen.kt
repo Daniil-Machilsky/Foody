@@ -167,60 +167,30 @@ fun RecipeExtraInfoCard(
     ),
     cookingTime: Int = 30
 ) {
-    Card(
+    Row(
         modifier = modifier,
-        shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.nutrition_data_title),
-                style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center
-            )
-            Spacer(Modifier.height(4.dp))
-            ExtraInfoElement(
-                modifier = Modifier.fillMaxWidth(),
-                iconResId = R.drawable.clock_filled,
-                labelResId = R.string.cooking_time,
-                unitsResId = R.string.min,
-                value = cookingTime
-            )
-            ExtraInfoElement(
-                modifier = Modifier.fillMaxWidth(),
-                iconResId = R.drawable.calories_icon,
-                labelResId = R.string.calories,
-                unitsResId = R.string.calories_units,
-                value = data.calories.toInt()
-            )
-            ExtraInfoElement(
-                modifier = Modifier.fillMaxWidth(),
-                iconResId = R.drawable.protein_icon,
-                labelResId = R.string.protein,
-                unitsResId = R.string.unit_gram,
-                value = data.protein.toInt()
-            )
-            ExtraInfoElement(
-                modifier = Modifier.fillMaxWidth(),
-                iconResId = R.drawable.carbohydrates_icon,
-                labelResId = R.string.carbohydrates,
-                unitsResId = R.string.unit_gram,
-                value = data.carbohydrates.toInt()
-            )
-            ExtraInfoElement(
-                modifier = Modifier.fillMaxWidth(),
-                iconResId = R.drawable.fat_icon,
-                labelResId = R.string.fat,
-                unitsResId = R.string.unit_gram,
-                value = data.fat.toInt()
-            )
-        }
+        RecipeCharacteristic(
+            label = stringResource(R.string.cooking_time),
+            value = cookingTime.toString(),
+            unit = stringResource(R.string.min),
+        )
+        RecipeCharacteristic(
+            label = stringResource(R.string.protein),
+            value = data.protein.toString(),
+            unit = stringResource(R.string.unit_gram),
+        )
+        RecipeCharacteristic(
+            label = stringResource(R.string.carbohydrates),
+            value = data.carbohydrates.toString(),
+            unit = stringResource(R.string.unit_gram),
+        )
+        RecipeCharacteristic(
+            label = stringResource(R.string.fat),
+            value = data.fat.toString(),
+            unit = stringResource(R.string.unit_gram),
+        )
     }
 }
 
@@ -410,7 +380,7 @@ private fun DetailsContent(
             }
             Spacer(Modifier.height(16.dp))
             RecipeExtraInfoCard(
-                modifier = Modifier.wrapContentHeight(),
+                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
                 data = state.recipe.nutrition,
                 cookingTime = state.recipe.minutes
             )
