@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.softcat.domain.entities.Ingredient
 import com.softcat.domain.entities.IngredientCategory
 import com.softcat.domain.entities.NutritionData
@@ -340,7 +342,7 @@ private fun DetailsContent(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
                 .padding(start = 16.dp, end = 16.dp)
-                .verticalScroll(scrollState)
+                .verticalScroll(scrollState),
         ) {
             val ingredientStrings = state.recipe.ingredients.map { it.name }
             val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -356,6 +358,15 @@ private fun DetailsContent(
                 text = state.recipe.description,
                 style = MaterialTheme.typography.bodyMedium,
                 color = Gray
+            )
+            AsyncImage(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                model = state.recipe.imageUrl,
+                contentDescription = null,
+                placeholder = painterResource(R.drawable.hat_smile_image),
+                fallback = painterResource(R.drawable.hat_smile_image),
+                error = painterResource(R.drawable.alert),
+                contentScale = ContentScale.Fit,
             )
             ElementsScrollableFlow(
                 modifier = Modifier
